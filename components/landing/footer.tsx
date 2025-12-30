@@ -6,7 +6,7 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-6 py-6">
         <div className="flex items-center justify-center gap-4 text-sm md:justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <span className="font-semibold text-foreground">kashio</span>
+            <span className="text-xl font-semibold text-foreground">kashio</span>
           </Link>
           
           <div className="flex items-center gap-3 text-muted-foreground">

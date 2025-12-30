@@ -1,15 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, MessageSquare } from "lucide-react";
+import Link from "next/link";
 
 export function Hero() {
   return (
     <section className="relative z-10 mx-auto max-w-7xl px-6 pb-24 pt-20 md:pt-32">
       <div className="flex flex-col items-center text-center">
-        {/* Badge */}
-        {/* <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 backdrop-blur-sm">
-          <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-          <span className="text-sm font-medium text-primary">Intelligent by design</span>
-        </div> */}
 
         {/* Main headline */}
         <h1 className="max-w-4xl text-5xl font-bold leading-[1.1] tracking-tight text-foreground md:text-7xl">
@@ -41,7 +37,13 @@ export function Hero() {
         {/* CTA buttons */}
         <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row">
           <Button size="lg" className="h-12 bg-primary px-8 text-base text-primary-foreground hover:bg-primary/90">
-            Start tracking free <ArrowRight className="ml-2 h-4 w-4" />
+            <Link
+              href="/signup"
+              className="flex items-center"
+              tabIndex={-1}
+            >
+              Start tracking free <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
           </Button>
           <Button size="lg" variant="outline" className="h-12 border-border bg-transparent px-8 text-base text-foreground hover:bg-muted">
             See how it works
