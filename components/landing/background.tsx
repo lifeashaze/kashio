@@ -1,6 +1,6 @@
 export function Background() {
   return (
-    <div className="pointer-events-none absolute inset-0">
+    <div className="pointer-events-none absolute inset-0 z-0">
       {/* Base gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-primary/[0.08] via-transparent to-chart-3/[0.05]" />
       

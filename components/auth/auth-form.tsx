@@ -68,23 +68,43 @@ function CheckIcon({ className }: { className?: string }) {
   )
 }
 
-export function SignupForm({
+type AuthMode = "login" | "signup"
+
+interface AuthFormProps extends Omit<React.ComponentProps<"form">, "onSubmit"> {
+  mode: AuthMode
+  onSubmit?: (data: {
+    email: string
+    password: string
+    name?: string
+  }) => void | Promise<void>
+}
+
+export function AuthForm({
+  mode,
   className,
+  onSubmit,
   ...props
-}: React.ComponentProps<"form">) {
+}: AuthFormProps) {
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
-  const passwordsMatch = password.length > 0 && confirmPassword.length > 0 && password === confirmPassword
+  const isLogin = mode === "login"
+  const isSignup = mode === "signup"
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const passwordsMatch =
+    password.length > 0 &&
+    confirmPassword.length > 0 &&
+    password === confirmPassword
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
-    if (!name.trim()) {
+
+    if (isSignup && !name.trim()) {
       toast.error("Please enter your name")
       return
     }
@@ -92,35 +112,71 @@ export function SignupForm({
       toast.error("Please enter your email")
       return
     }
-    if (password.length < 8) {
+    if (!password.trim()) {
+      toast.error("Please enter your password")
+      return
+    }
+    if (isSignup && password.length < 8) {
       toast.error("Password must be at least 8 characters")
       return
     }
-    if (!passwordsMatch) {
+    if (isSignup && !passwordsMatch) {
       toast.error("Passwords do not match")
       return
     }
-    
-    toast.success("Account created successfully!")
+
+    if (onSubmit) {
+      setIsLoading(true)
+      try {
+        await onSubmit({
+          email,
+          password,
+          ...(isSignup && { name }),
+        })
+      } finally {
+        setIsLoading(false)
+      }
+    } else {
+      // Default behavior when no onSubmit provided
+      toast.success(isLogin ? "Logged in successfully!" : "Account created successfully!")
+    }
   }
 
+  const heading = isLogin ? "Welcome back" : "Create your account"
+  const submitText = isLogin ? "Sign In" : "Create Account"
+  const oauthText = isLogin ? "Sign in with" : "Sign up with"
+  const switchLink = isLogin ? (
+    <>Don&apos;t have an account? <a href="/signup">Sign up</a></>
+  ) : (
+    <>Already have an account? <a href="/login">Sign in</a></>
+  )
+
   return (
-    <form className={cn("flex flex-col gap-6", className)} {...props} onSubmit={handleSubmit}>
+    <form
+      className={cn("flex flex-col gap-6", className)}
+      {...props}
+      onSubmit={handleSubmit}
+    >
       <FieldGroup>
         <div className="flex flex-col items-center gap-1 text-center">
-          <h1 className="text-2xl font-bold">Create your account</h1>
+          <h1 className="text-2xl font-bold">{heading}</h1>
         </div>
-        <Field>
-          <FieldLabel htmlFor="name">Name</FieldLabel>
-          <Input
-            id="name"
-            type="text"
-            placeholder="John Doe"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-        </Field>
+
+        {isSignup && (
+          <Field>
+            <FieldLabel htmlFor="name">Name</FieldLabel>
+            <Input
+              id="name"
+              type="text"
+              placeholder="John Doe"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              disabled={isLoading}
+              required
+            />
+          </Field>
+        )}
+
         <Field>
           <FieldLabel htmlFor="email">Email</FieldLabel>
           <Input
@@ -129,9 +185,11 @@ export function SignupForm({
             placeholder="m@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            disabled={isLoading}
             required
           />
         </Field>
+
         <Field>
           <FieldLabel htmlFor="password">Password</FieldLabel>
           <div className="relative">
@@ -141,6 +199,7 @@ export function SignupForm({
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="pr-10"
+              disabled={isLoading}
               required
             />
             <button
@@ -156,56 +215,75 @@ export function SignupForm({
               )}
             </button>
           </div>
-          <FieldDescription>
-            Must be at least 8 characters long.
-          </FieldDescription>
+          {isLogin && (
+            <FieldDescription>
+              <a href="#" className="text-sm underline-offset-4 hover:underline">
+                Forgot your password?
+              </a>
+            </FieldDescription>
+          )}
+          {isSignup && (
+            <FieldDescription>
+              Must be at least 8 characters long.
+            </FieldDescription>
+          )}
         </Field>
+
+        {isSignup && (
+          <Field>
+            <FieldLabel htmlFor="confirm-password">Confirm Password</FieldLabel>
+            <div className="relative">
+              <Input
+                id="confirm-password"
+                type={showConfirmPassword ? "text" : "password"}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="pr-10"
+                disabled={isLoading}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                tabIndex={-1}
+              >
+                {showConfirmPassword ? (
+                  <EyeOffIcon className="size-4" />
+                ) : (
+                  <EyeIcon className="size-4" />
+                )}
+              </button>
+            </div>
+            <FieldDescription className="flex items-center gap-1">
+              Please confirm your password.
+              {passwordsMatch && <CheckIcon className="size-3.5 text-green-500" />}
+            </FieldDescription>
+          </Field>
+        )}
+
         <Field>
-          <FieldLabel htmlFor="confirm-password">Confirm Password</FieldLabel>
-          <div className="relative">
-            <Input
-              id="confirm-password"
-              type={showConfirmPassword ? "text" : "password"}
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="pr-10"
-              required
-            />
-            <button
-              type="button"
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-              tabIndex={-1}
-            >
-              {showConfirmPassword ? (
-                <EyeOffIcon className="size-4" />
-              ) : (
-                <EyeIcon className="size-4" />
-              )}
-            </button>
-          </div>
-          <FieldDescription className="flex items-center gap-1">
-            Please confirm your password.
-            {passwordsMatch && <CheckIcon className="size-3.5 text-green-500" />}
-          </FieldDescription>
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? "Loading..." : submitText}
+          </Button>
         </Field>
-        <Field>
-          <Button type="submit">Create Account</Button>
-        </Field>
+
         <FieldSeparator>Or continue with</FieldSeparator>
+
         <Field>
-          <Button variant="outline" type="button">
+          <Button variant="outline" type="button" disabled={isLoading}>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
               <path
                 d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"
                 fill="currentColor"
               />
             </svg>
-            Sign up with GitHub
+            {oauthText} GitHub
           </Button>
         </Field>
+
         <Field>
-          <Button variant="outline" type="button">
+          <Button variant="outline" type="button" disabled={isLoading}>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
               <path
                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -224,13 +302,14 @@ export function SignupForm({
                 fill="#EA4335"
               />
             </svg>
-            Sign up with Google
+            {oauthText} Google
           </Button>
           <FieldDescription className="px-6 text-center">
-            Already have an account? <a href="#">Sign in</a>
+            {switchLink}
           </FieldDescription>
         </Field>
       </FieldGroup>
     </form>
   )
 }
+
