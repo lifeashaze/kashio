@@ -1,6 +1,5 @@
 import { AuthForm } from "@/components/auth/auth-form"
 
-
 export default function SignupPage() {
     return (
         <div className="grid min-h-svh lg:grid-cols-2">

@@ -1,5 +1,8 @@
 import { pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
+// Re-export auth schema tables
+export * from "@/auth-schema";
+
 export const changelog = pgTable("changelog", {
   id: uuid("id").primaryKey().defaultRandom(),
   date: timestamp("date").notNull().defaultNow(),
