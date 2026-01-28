@@ -1,8 +1,8 @@
 import { Footer } from "@/components/landing";
+import { ChangelogHeader } from "@/components/changelog-header";
 import { db } from "@/lib/db";
 import { changelog } from "@/lib/schema";
 import { desc } from "drizzle-orm";
-import Link from "next/link";
 
 async function getChangelog() {
   try {
@@ -29,13 +29,9 @@ export default async function ChangelogPage() {
 
   return (
     <div className="relative flex min-h-screen flex-col overflow-hidden bg-background">
-      
-      <header className="relative z-10 mx-auto w-full max-w-2xl px-6 py-6">
-        <Link href="/" className="text-sm text-muted-foreground hover:text-foreground">
-          ← Back to home
-        </Link>
-      </header>
-      
+
+      <ChangelogHeader />
+
       <main className="relative z-10 mx-auto w-full max-w-2xl flex-1 px-6 pb-16">
         <h1 className="mb-2 text-3xl font-bold text-foreground">Changelog</h1>
         <p className="mb-12 text-muted-foreground">

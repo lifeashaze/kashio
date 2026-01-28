@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export function HomeNav() {
   return (
@@ -9,6 +12,7 @@ export function HomeNav() {
           kashio
         </Link>
         <div className="flex items-center gap-3">
+          <ThemeToggle />
           <Button
             variant="outline"
             size="sm"
