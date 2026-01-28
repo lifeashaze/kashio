@@ -1,36 +1,113 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Kashio
+
+Kashio is a full-stack expense tracking app with natural-language logging, built on Next.js 16 (App Router), TypeScript, Tailwind CSS 4, Drizzle ORM + PostgreSQL, and Better Auth.
+
+## Features
+
+- Natural-language expense entry and dashboard
+- Email/password and OAuth authentication (GitHub, Google)
+- API-first mutations with App Router routes
+- Drizzle ORM schema + migrations
+
+## Tech Stack
+
+- Next.js 16 (App Router)
+- TypeScript
+- Tailwind CSS 4
+- Drizzle ORM + PostgreSQL
+- Better Auth
 
 ## Getting Started
 
-First, run the development server:
+Install dependencies:
+
+```bash
+npm install
+```
+
+Create `.env.local`:
+
+```bash
+DATABASE_URL="postgresql://..."
+BETTER_AUTH_SECRET="random-secret-key"
+BETTER_AUTH_URL="http://localhost:3000"
+
+# Optional OAuth providers
+GITHUB_CLIENT_ID="..."
+GITHUB_CLIENT_SECRET="..."
+GOOGLE_CLIENT_ID="..."
+GOOGLE_CLIENT_SECRET="..."
+```
+
+Run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Common Commands
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+# Development
+npm run dev
 
-## Learn More
+# Database
+npm run db:generate
+npm run db:migrate
+npm run db:push
+npm run db:studio
 
-To learn more about Next.js, take a look at the following resources:
+# Production
+npm run build
+npm run start
+npm run lint
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+app/
+  api/auth/[...all]/route.ts   # Better Auth catch-all API
+  api/changelog/route.ts       # Changelog API
+  page.tsx                     # Landing page (public)
+  home/page.tsx                # Dashboard (protected)
+  login/page.tsx               # Login page
+  signup/page.tsx              # Signup page
+  changelog/page.tsx           # Changelog page
+components/
+  auth/                        # Auth UI
+  home/                        # Dashboard UI
+  landing/                     # Landing sections
+  ui/                          # Reusable UI primitives
+lib/
+  auth.ts                      # Better Auth server config
+  auth-client.ts               # Better Auth React client
+  db.ts                        # Drizzle + pg connection
+  schema.ts                    # App + auth schema
+```
 
-## Deploy on Vercel
+## Database Notes
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Update schema in `lib/schema.ts` (or `lib/auth-schema.ts`)
+- Generate migrations with `npm run db:generate`
+- Apply migrations with `npm run db:migrate`
+- Use `npm run db:push` for development-only sync
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Authentication Notes
+
+Auth is centralized across:
+
+- `lib/auth.ts` (server config)
+- `lib/auth-client.ts` (client)
+- `app/api/auth/[...all]/route.ts` (API routes)
+- `components/auth/auth-form.tsx` (UI)
+
+## Deployment
+
+Use any Node/Next.js-compatible host. Ensure environment variables are set in your hosting provider.
+
+## License
+
+MIT
