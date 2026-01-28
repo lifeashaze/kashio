@@ -1,4 +1,4 @@
-import { Background, Footer } from "@/components/landing";
+import { Footer } from "@/components/landing";
 import { db } from "@/lib/db";
 import { changelog } from "@/lib/schema";
 import { desc } from "drizzle-orm";
@@ -29,7 +29,6 @@ export default async function ChangelogPage() {
 
   return (
     <div className="relative flex min-h-screen flex-col overflow-hidden bg-background">
-      <Background />
       
       <header className="relative z-10 mx-auto w-full max-w-2xl px-6 py-6">
         <Link href="/" className="text-sm text-muted-foreground hover:text-foreground">

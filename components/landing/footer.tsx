@@ -2,26 +2,21 @@ import Link from "next/link";
 
 export function Footer() {
   return (
-    <footer className="relative z-10 border-t border-border">
-      <div className="mx-auto max-w-7xl px-6 py-6">
-        <div className="flex items-center justify-center gap-4 text-sm md:justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <span className="text-xl font-semibold text-foreground">kashio</span>
+    <footer className="relative overflow-hidden border-t border-border/40 px-6 py-12">
+      <div className="relative z-10 mx-auto max-w-7xl">
+        <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
+          <span className="font-heading text-lg font-bold tracking-tight text-foreground">
+            kashio
+          </span>
+
+          <Link
+            href="/changelog"
+            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Changelog
           </Link>
-          
-          <div className="flex items-center gap-3 text-muted-foreground">
-            <Link 
-              href="/changelog" 
-              className="transition-colors hover:text-foreground"
-            >
-              Changelog
-            </Link>
-            <span className="text-muted-foreground/40">·</span>
-            <span>© 2025</span>
-          </div>
         </div>
       </div>
     </footer>
   );
 }
-

@@ -1,21 +1,19 @@
 import {
-  Background,
-  Navigation,
+  Nav,
   Hero,
+  ProductShowcase,
   HowItWorks,
-  BentoFeatures,
   CTA,
   Footer,
 } from "@/components/landing";
 
 export default function LandingPage() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-background">
-      <Background />
-      <Navigation />
+    <div className="relative min-h-screen bg-background">
+      <Nav />
       <Hero />
+      <ProductShowcase />
       <HowItWorks />
-      <BentoFeatures />
       <CTA />
       <Footer />
     </div>

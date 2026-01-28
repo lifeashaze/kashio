@@ -99,7 +99,7 @@ export function AuthForm({
             return
           }
           toast.success("Account created successfully!")
-          router.push("/")
+          router.push("/home")
         } else {
           const { error } = await authClient.signIn.email({
             email,
@@ -110,7 +110,7 @@ export function AuthForm({
             return
           }
           toast.success("Signed in successfully!")
-          router.push("/")
+          router.push("/home")
         }
       } finally {
         setLoadingAction(null)
@@ -123,7 +123,7 @@ export function AuthForm({
     try {
       await authClient.signIn.social({
         provider,
-        callbackURL: "/",
+        callbackURL: "/home",
       })
     } catch {
       toast.error(`Failed to sign in with ${provider}`)
@@ -137,9 +137,9 @@ export function AuthForm({
   const submitText = isLogin ? "Sign In" : "Create Account"
   const oauthText = isLogin ? "Sign in with" : "Sign up with"
   const switchLink = isLogin ? (
-    <>Don&apos;t have an account? <a href="/signup">Sign up</a></>
+    <>Don&apos;t have an account? <a href="/signup" className="font-medium text-primary hover:underline">Sign up</a></>
   ) : (
-    <>Already have an account? <a href="/login">Sign in</a></>
+    <>Already have an account? <a href="/login" className="font-medium text-primary hover:underline">Sign in</a></>
   )
 
   return (
@@ -149,8 +149,11 @@ export function AuthForm({
       onSubmit={handleSubmit}
     >
       <FieldGroup>
-        <div className="flex flex-col items-center gap-1 text-center">
-          <h1 className="text-2xl font-bold">{heading}</h1>
+        <div className="flex flex-col gap-2 text-center">
+          <h1 className="font-heading text-3xl font-bold tracking-tight">{heading}</h1>
+          <p className="text-sm text-muted-foreground">
+            {isLogin ? "Sign in to your account" : "Get started with kashio"}
+          </p>
         </div>
 
         {isSignup && (
@@ -206,7 +209,7 @@ export function AuthForm({
           </div>
           {isLogin && (
             <FieldDescription>
-              <a href="#" className="text-sm underline-offset-4 hover:underline">
+              <a href="#" className="text-sm text-primary hover:underline">
                 Forgot your password?
               </a>
             </FieldDescription>
@@ -252,12 +255,12 @@ export function AuthForm({
         )}
 
         <Field>
-          <Button type="submit" disabled={isLoading}>
+          <Button type="submit" disabled={isLoading} className="h-11 bg-primary font-medium shadow-lg shadow-primary/30">
             {loadingAction === "submit" ? <LoaderCircle className="size-4 animate-spin" /> : submitText}
           </Button>
         </Field>
 
-        <FieldSeparator>Or continue with</FieldSeparator>
+        <FieldSeparator>or</FieldSeparator>
 
         <Field>
           <Button
@@ -315,7 +318,7 @@ export function AuthForm({
               </>
             )}
           </Button>
-          <FieldDescription className="px-6 text-center">
+          <FieldDescription className="text-center text-sm">
             {switchLink}
           </FieldDescription>
         </Field>

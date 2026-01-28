@@ -1,19 +1,52 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
+import Link from "next/link";
 
 export function CTA() {
   return (
-    <section className="relative z-10 mx-auto max-w-2xl px-6 py-24 flex flex-col items-center text-center">
-      <h2 className="text-3xl font-bold md:text-5xl text-foreground mb-4">
-        Start tracking smarter today
-      </h2>
-      <p className="max-w-xl text-lg text-muted-foreground mb-8">
-        Your finances, finally simple. Get started in seconds and see where your money goes.
-      </p>
-      <Button size="lg" className="h-12 px-8 text-base">
-        Get started free <ArrowRight className="ml-2 h-4 w-4" />
-      </Button>
+    <section className="relative overflow-hidden px-6 py-24 md:py-32">
+      <div className="relative z-10 mx-auto max-w-4xl">
+        <div className="relative overflow-hidden rounded-3xl border border-border bg-card p-12 md:p-16">
+          <div className="relative z-10 text-center">
+            <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+              <Sparkles className="h-3 w-3" />
+              Free forever
+            </div>
+
+            <h2 className="mt-6 font-heading text-4xl font-bold tracking-tight text-foreground md:text-5xl">
+              Ready to start tracking?
+            </h2>
+
+            <p className="mx-auto mt-4 max-w-xl text-lg text-muted-foreground">
+              No credit card required. Start organizing your expenses in seconds.
+            </p>
+
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+              <Button
+                size="lg"
+                className="h-12 bg-primary px-8 text-base font-medium shadow-lg shadow-primary/30"
+                asChild
+              >
+                <Link href="/signup">
+                  Get started free <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="h-12 px-8 text-base"
+                asChild
+              >
+                <Link href="/login">Sign in</Link>
+              </Button>
+            </div>
+          </div>
+
+          {/* Decorative gradients */}
+          <div className="pointer-events-none absolute -left-20 top-0 h-60 w-60 rounded-full bg-primary/20 blur-[100px]" />
+          <div className="pointer-events-none absolute -right-20 bottom-0 h-60 w-60 rounded-full bg-chart-1/20 blur-[100px]" />
+        </div>
+      </div>
     </section>
   );
 }
-

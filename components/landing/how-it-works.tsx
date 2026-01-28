@@ -1,49 +1,132 @@
+"use client";
+
+import { Type, Sparkles, BarChart } from "lucide-react";
+
 const steps = [
   {
-    step: "01",
+    number: "01",
+    icon: Type,
     title: "Type naturally",
-    description: "Write like you're texting a friend. \"Uber to airport $45\" or \"Grabbed coffee with Maya, $12\". No rigid forms.",
+    description: "Express yourself however feels natural. \"coffee $5\", \"split dinner with 3 friends $120\", or \"uber ~$15\".",
+    example: {
+      input: "lunch with client $45",
+      bg: "from-chart-1/10 to-chart-1/5",
+    },
   },
   {
-    step: "02",
-    title: "Instant understanding",
-    description: "Kashio parses amounts, dates, vendors, and categories in milliseconds. It learns your patterns and gets smarter over time.",
+    number: "02",
+    icon: Sparkles,
+    title: "AI parses instantly",
+    description: "Our AI extracts everything—amount, category, merchant, splits, context—in milliseconds. Zero manual work required.",
+    example: {
+      parsed: ["$45.00", "Dining", "Business lunch"],
+      bg: "from-primary/10 to-primary/5",
+    },
   },
   {
-    step: "03",
-    title: "See the full picture",
-    description: "Watch your spending unfold in beautiful visualizations. Spot trends, set goals, and finally feel in control of your money.",
+    number: "03",
+    icon: BarChart,
+    title: "Track and analyze",
+    description: "Watch your finances organize themselves. Get insights, trends, and breakdowns that help you make better decisions.",
+    example: {
+      chart: true,
+      bg: "from-chart-2/10 to-chart-2/5",
+    },
   },
 ];
 
 export function HowItWorks() {
   return (
-    <section id="how-it-works" className="relative z-10 mx-auto max-w-7xl px-6 py-24">
-      <div className="mb-16 text-center">
-        <h2 className="text-3xl font-bold text-foreground md:text-5xl">
-          Finance tracking,{" "}
-          <span className="bg-gradient-to-r from-primary to-chart-2 bg-clip-text text-transparent">reimagined</span>
-        </h2>
-        <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
-          Forget the friction of traditional budgeting. Kashio turns your words into organized finances instantly.
-        </p>
+    <section id="how-it-works" className="relative overflow-hidden px-6 py-24 md:py-32">
+      <div className="relative z-10 mx-auto max-w-7xl">
+        {/* Header */}
+        <div className="mx-auto max-w-3xl text-center">
+          <h2 className="font-heading text-4xl font-bold tracking-tight text-foreground md:text-5xl lg:text-6xl">
+            How it works
+          </h2>
+          <p className="mt-4 text-lg text-muted-foreground md:text-xl">
+            Three simple steps to effortless expense tracking
+          </p>
+        </div>
+
+        {/* Steps */}
+        <div className="mt-20 grid gap-8 lg:grid-cols-3">
+          {steps.map((step, index) => {
+            const Icon = step.icon;
+            return (
+              <div key={index} className="relative">
+                {/* Connector line */}
+                {index < steps.length - 1 && (
+                  <div className="absolute left-1/2 top-8 hidden h-px w-full bg-gradient-to-r from-border via-primary/50 to-border lg:block" />
+                )}
+
+                <div className="relative overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-card to-card/50 p-8">
+                  <div className="relative z-10">
+                    {/* Number badge */}
+                    <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 ring-1 ring-primary/20">
+                      <span className="font-heading text-lg font-bold text-primary">
+                        {step.number}
+                      </span>
+                    </div>
+
+                    {/* Icon */}
+                    <div className="mt-6 inline-flex rounded-xl bg-gradient-to-br p-3 ring-1 ring-border">
+                      <Icon className="h-6 w-6 text-primary" />
+                    </div>
+
+                    {/* Content */}
+                    <h3 className="mt-6 font-heading text-2xl font-bold text-foreground">
+                      {step.title}
+                    </h3>
+                    <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                      {step.description}
+                    </p>
+
+                    {/* Example visual */}
+                    <div className={`mt-6 rounded-xl border border-border/50 bg-gradient-to-br ${step.example.bg} p-4`}>
+                      {step.example.input && (
+                        <div className="font-mono text-sm text-foreground">
+                          → {step.example.input}
+                        </div>
+                      )}
+                      {step.example.parsed && (
+                        <div className="space-y-2">
+                          {step.example.parsed.map((item, i) => (
+                            <div key={i} className="flex items-center gap-2 text-sm">
+                              <div className="h-1.5 w-1.5 rounded-full bg-primary" />
+                              <span className="font-medium text-foreground">{item}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {step.example.chart && (
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-muted-foreground">This week</span>
+                            <span className="font-mono font-semibold text-foreground">$487</span>
+                          </div>
+                          <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+                            <div className="h-full w-[65%] rounded-full bg-primary" />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Background gradient */}
+                  <div className={`pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-gradient-to-br ${step.example.bg} blur-[60px]`} />
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
-      <div className="grid gap-8 md:grid-cols-3">
-        {steps.map((item, index) => (
-          <div key={item.step} className="relative">
-            <div className="bg-gradient-to-r from-chart-1 via-primary to-chart-2 bg-clip-text text-6xl font-bold text-transparent opacity-50">
-              {item.step}
-            </div>
-            <h3 className="mt-4 text-xl font-semibold text-foreground">{item.title}</h3>
-            <p className="mt-2 text-muted-foreground leading-relaxed">{item.description}</p>
-            {index < 2 && (
-              <div className="absolute right-0 top-8 hidden h-0.5 w-16 bg-gradient-to-r from-primary/30 to-transparent lg:block" />
-            )}
-          </div>
-        ))}
+      {/* Background decoration */}
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute left-1/4 top-1/4 h-[400px] w-[400px] rounded-full bg-primary/10 blur-[100px]" />
+        <div className="absolute bottom-1/4 right-1/4 h-[400px] w-[400px] rounded-full bg-chart-2/10 blur-[100px]" />
       </div>
     </section>
   );
 }
-
