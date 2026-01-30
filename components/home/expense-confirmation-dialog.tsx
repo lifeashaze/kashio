@@ -27,6 +27,7 @@ import {
   type ExpenseCategory,
 } from "@/lib/constants/categories";
 import type { ParsedExpense, ValidatedExpense } from "@/lib/types/expense";
+import { getConfirmationMessage } from "@/lib/prompts/expense-parser";
 
 type ExpenseConfirmationDialogProps = {
   open: boolean;
@@ -70,32 +71,36 @@ export function ExpenseConfirmationDialog({
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="max-w-md">
+      <AlertDialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
         <AlertDialogHeader>
-          <AlertDialogTitle className="flex items-center gap-2">
-            <AlertCircle className="h-5 w-5 text-amber-500" />
+          <AlertDialogTitle className="flex items-center gap-2 text-base sm:text-lg">
+            <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 text-amber-500 flex-shrink-0" />
             Review Expense
           </AlertDialogTitle>
-          <AlertDialogDescription>
-            {parsedExpense.reasoning}
+          <AlertDialogDescription className="text-xs sm:text-sm">
+            {getConfirmationMessage(
+              parsedExpense.confidence,
+              parsedExpense.missingFields,
+              parsedExpense.reasoning
+            )}
           </AlertDialogDescription>
         </AlertDialogHeader>
 
-        <div className="space-y-4 py-4">
+        <div className="space-y-3 sm:space-y-4 py-3 sm:py-4">
           {/* Amount */}
-          <div className="space-y-2">
+          <div className="space-y-1.5 sm:space-y-2">
             <Label
               htmlFor="amount"
-              className={
+              className={`text-xs sm:text-sm ${
                 parsedExpense.missingFields.includes("amount")
                   ? "text-red-600"
                   : ""
-              }
+              }`}
             >
               Amount {parsedExpense.missingFields.includes("amount") && "*"}
             </Label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+              <span className="absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 text-xs sm:text-sm text-muted-foreground">
                 $
               </span>
               <Input
@@ -105,7 +110,7 @@ export function ExpenseConfirmationDialog({
                 min="0"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="pl-7"
+                className="pl-6 sm:pl-7 text-sm h-9 sm:h-10"
                 placeholder="0.00"
                 autoFocus={parsedExpense.missingFields.includes("amount")}
               />
@@ -113,14 +118,14 @@ export function ExpenseConfirmationDialog({
           </div>
 
           {/* Description */}
-          <div className="space-y-2">
+          <div className="space-y-1.5 sm:space-y-2">
             <Label
               htmlFor="description"
-              className={
+              className={`text-xs sm:text-sm ${
                 parsedExpense.missingFields.includes("description")
                   ? "text-red-600"
                   : ""
-              }
+              }`}
             >
               Description{" "}
               {parsedExpense.missingFields.includes("description") && "*"}
@@ -130,6 +135,7 @@ export function ExpenseConfirmationDialog({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="What did you buy?"
+              className="text-sm h-9 sm:h-10"
               autoFocus={
                 !parsedExpense.missingFields.includes("amount") &&
                 parsedExpense.missingFields.includes("description")
@@ -138,18 +144,18 @@ export function ExpenseConfirmationDialog({
           </div>
 
           {/* Category */}
-          <div className="space-y-2">
-            <Label htmlFor="category">Category</Label>
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label htmlFor="category" className="text-xs sm:text-sm">Category</Label>
             <Select
               value={category}
               onValueChange={(value) => setCategory(value as ExpenseCategory)}
             >
-              <SelectTrigger id="category">
+              <SelectTrigger id="category" className="text-sm h-9 sm:h-10">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 {EXPENSE_CATEGORIES.map((cat) => (
-                  <SelectItem key={cat} value={cat}>
+                  <SelectItem key={cat} value={cat} className="text-sm">
                     {CATEGORY_LABELS[cat]}
                   </SelectItem>
                 ))}
@@ -158,20 +164,23 @@ export function ExpenseConfirmationDialog({
           </div>
 
           {/* Date */}
-          <div className="space-y-2">
-            <Label htmlFor="date">Date & Time</Label>
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label htmlFor="date" className="text-xs sm:text-sm">Date & Time</Label>
             <Input
               id="date"
               type="datetime-local"
               value={date.slice(0, 16)}
               onChange={(e) => setDate(e.target.value + ":00")}
+              className="text-sm h-9 sm:h-10"
             />
           </div>
         </div>
 
-        <AlertDialogFooter>
-          <AlertDialogCancel onClick={onCancel}>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleConfirm} disabled={!isValid}>
+        <AlertDialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
+          <AlertDialogCancel onClick={onCancel} className="text-sm h-9 sm:h-10 w-full sm:w-auto m-0">
+            Cancel
+          </AlertDialogCancel>
+          <AlertDialogAction onClick={handleConfirm} disabled={!isValid} className="text-sm h-9 sm:h-10 w-full sm:w-auto">
             Save Expense
           </AlertDialogAction>
         </AlertDialogFooter>

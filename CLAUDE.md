@@ -17,6 +17,7 @@ npm run db:generate      # Generate Drizzle migration from schema changes
 npm run db:migrate       # Apply pending migrations to database
 npm run db:push          # Push schema changes without creating migration files
 npm run db:studio        # Open Drizzle Studio (visual database browser)
+bun run db:reset         # Clear all data from database (keeps schema intact)
 
 # Production
 npm run build            # Create production build
@@ -127,6 +128,48 @@ GITHUB_CLIENT_SECRET="..."
 GOOGLE_CLIENT_ID="..."
 GOOGLE_CLIENT_SECRET="..."
 ```
+
+## API Client
+
+The app uses a centralized API client (`lib/api/client.ts`) for all HTTP requests:
+
+```typescript
+import { apiClient, ApiError } from "@/lib/api/client";
+
+// GET request
+const data = await apiClient.get<DataType>("/api/endpoint");
+
+// POST request
+const result = await apiClient.post<ResultType>("/api/endpoint", {
+  key: "value",
+});
+
+// Error handling
+try {
+  await apiClient.post("/api/endpoint", data);
+} catch (err) {
+  if (err instanceof ApiError) {
+    console.error(err.message, err.status, err.data);
+  }
+}
+```
+
+Benefits:
+- Automatic JSON parsing and Content-Type headers
+- Consistent error handling across the app
+- Type-safe responses with TypeScript generics
+- Cleaner, more readable code
+
+## AI Prompts
+
+All AI prompts are centralized in `lib/prompts/` for easy maintenance:
+
+- `expense-parser.ts` - Expense parsing system prompts and user-facing messages
+
+When modifying AI behavior:
+1. Update the prompt in the appropriate file under `lib/prompts/`
+2. No need to search through API routes - prompts are in one place
+3. User-facing messages are separate from system prompts for better UX
 
 ## Common Patterns
 

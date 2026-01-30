@@ -4,27 +4,27 @@ import Link from "next/link";
 
 export function CTA() {
   return (
-    <section className="relative overflow-hidden px-6 py-24 md:py-32">
+    <section className="relative overflow-hidden px-4 sm:px-6 py-16 sm:py-24 md:py-32">
       <div className="relative z-10 mx-auto max-w-4xl">
-        <div className="relative overflow-hidden rounded-3xl border border-border bg-card p-12 md:p-16">
+        <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-border bg-card p-8 sm:p-12 md:p-16">
           <div className="relative z-10 text-center">
-            <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+            <div className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full border border-primary/20 bg-primary/10 px-2.5 sm:px-3 py-1 text-xs font-medium text-primary">
               <Sparkles className="h-3 w-3" />
               Free forever
             </div>
 
-            <h2 className="mt-6 font-heading text-4xl font-bold tracking-tight text-foreground md:text-5xl">
+            <h2 className="mt-4 sm:mt-6 font-heading text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-foreground">
               Ready to start tracking?
             </h2>
 
-            <p className="mx-auto mt-4 max-w-xl text-lg text-muted-foreground">
+            <p className="mx-auto mt-3 sm:mt-4 max-w-xl text-sm sm:text-base md:text-lg text-muted-foreground px-2">
               No credit card required. Start organizing your expenses in seconds.
             </p>
 
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+            <div className="mt-6 sm:mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center px-2">
               <Button
                 size="lg"
-                className="h-12 bg-primary px-8 text-base font-medium shadow-lg shadow-primary/30"
+                className="w-full sm:w-auto h-11 sm:h-12 bg-primary px-6 sm:px-8 text-sm sm:text-base font-medium shadow-lg shadow-primary/30"
                 asChild
               >
                 <Link href="/signup">
@@ -34,7 +34,7 @@ export function CTA() {
               <Button
                 size="lg"
                 variant="outline"
-                className="h-12 px-8 text-base"
+                className="w-full sm:w-auto h-11 sm:h-12 px-6 sm:px-8 text-sm sm:text-base"
                 asChild
               >
                 <Link href="/login">Sign in</Link>

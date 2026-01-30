@@ -10,6 +10,8 @@ export function middleware(request: NextRequest) {
   const sessionCookie = request.cookies.get("better-auth.session_token");
   const hasSession = !!sessionCookie;
 
+  // Don't redirect auth routes if there's a session cookie
+  // Let the page handle invalid sessions
   if (authRoutes.includes(pathname) && hasSession) {
     return NextResponse.redirect(new URL("/home", request.url));
   }

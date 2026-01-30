@@ -11,6 +11,7 @@ import {
   VALIDATION_ERROR_DURATION,
 } from "@/lib/constants/timing";
 import type { ParsedExpense, ValidatedExpense } from "@/lib/types/expense";
+import { apiClient, ApiError } from "@/lib/api/client";
 
 export function HomeInput() {
   const [input, setInput] = useState("");
@@ -29,19 +30,14 @@ export function HomeInput() {
   const saveExpense = async (expense: ValidatedExpense, rawInput: string) => {
     try {
       setStatus("saving");
-      const saveResponse = await fetch("/api/expenses", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          amount: expense.amount,
-          description: expense.description,
-          category: expense.category,
-          date: expense.date,
-          rawInput,
-        }),
-      });
 
-      if (!saveResponse.ok) throw new Error("Failed to save expense");
+      await apiClient.post("/api/expenses", {
+        amount: expense.amount,
+        description: expense.description,
+        category: expense.category,
+        date: expense.date,
+        rawInput,
+      });
 
       setStatus("saved");
       setInput("");
@@ -51,7 +47,13 @@ export function HomeInput() {
       }, SUCCESS_DISPLAY_DURATION);
     } catch (err) {
       console.error("Error:", err);
-      setError(err instanceof Error ? err.message : "Unknown error");
+      setError(
+        err instanceof ApiError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : "Unknown error"
+      );
       setStatus("error");
       setTimeout(() => {
         setStatus("idle");
@@ -76,17 +78,10 @@ export function HomeInput() {
 
     try {
       // Parse expense with AI
-      const parseResponse = await fetch("/api/parse-expense", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: currentInput }),
+      const parsed = await apiClient.post<ParsedExpense>("/api/parse-expense", {
+        prompt: currentInput,
       });
 
-      if (!parseResponse.ok) {
-        throw new Error("Failed to parse expense");
-      }
-
-      const parsed: ParsedExpense = await parseResponse.json();
       setParsedExpense(parsed);
       setParseTime(Date.now() - start);
       setStatus("idle");
@@ -141,7 +136,13 @@ export function HomeInput() {
       }
     } catch (err) {
       console.error("Error:", err);
-      setError(err instanceof Error ? err.message : "Unknown error");
+      setError(
+        err instanceof ApiError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : "Unknown error"
+      );
       setStatus("error");
       setTimeout(() => {
         setStatus("idle");
@@ -176,19 +177,20 @@ export function HomeInput() {
   return (
     <div className="w-full space-y-3">
       <form onSubmit={handleSubmit} className="w-full">
-        <div className="flex items-end gap-2 rounded-2xl border border-border/60 bg-card p-2 shadow-sm">
-          <div className="flex-1">
+        <div className="flex items-end gap-2 rounded-xl sm:rounded-2xl border border-border/60 bg-card p-2 shadow-sm">
+          <div className="flex-1 min-w-0">
             <input
               value={input}
               onChange={(event) => setInput(event.target.value)}
               placeholder="Type an expense... e.g. 'Coffee $5'"
-              className="w-full resize-none bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none md:text-base"
+              className="w-full resize-none bg-transparent px-2 sm:px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none md:text-base"
               autoFocus
               disabled={isLoading}
             />
             {!input && status === "idle" && (
-              <p className="px-3 pb-2 text-xs text-muted-foreground">
-                Try: "$15 lunch at chipotle" or "coffee $5 this morning"
+              <p className="px-2 sm:px-3 pb-2 text-[10px] sm:text-xs text-muted-foreground">
+                <span className="hidden sm:inline">Try: "$15 lunch at chipotle" or "coffee $5 this morning"</span>
+                <span className="sm:hidden">Try: "Coffee $5" or "$15 lunch"</span>
               </p>
             )}
           </div>
@@ -196,14 +198,14 @@ export function HomeInput() {
             type="submit"
             size="sm"
             disabled={!input.trim() || isLoading}
-            className="h-9 shrink-0 rounded-xl px-4"
+            className="h-8 sm:h-9 shrink-0 rounded-lg sm:rounded-xl px-3 sm:px-4"
           >
             {status === "saved" ? (
-              <Check className="h-4 w-4" />
+              <Check className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             ) : status === "error" ? (
-              <AlertCircle className="h-4 w-4" />
+              <AlertCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             ) : (
-              <Send className="h-4 w-4" />
+              <Send className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             )}
           </Button>
         </div>
@@ -211,58 +213,66 @@ export function HomeInput() {
 
       {/* Status Feedback */}
       {status === "parsing" && (
-        <div className="flex items-center gap-2 rounded-xl border border-border/40 bg-muted/30 px-4 py-2.5 text-sm">
-          <div className="h-4 w-4 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
+        <div className="flex items-center gap-2 rounded-lg sm:rounded-xl border border-border/40 bg-muted/30 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm">
+          <div className="h-3.5 w-3.5 sm:h-4 sm:w-4 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
           <span className="text-muted-foreground">Parsing expense...</span>
         </div>
       )}
 
-      {parsedExpense && parsedExpense.isValidExpense && parsedExpense.amount && parsedExpense.description && (
-        <div className="space-y-2 rounded-xl border border-border/60 bg-card p-4 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-lg">
+      {parsedExpense && parsedExpense.isValidExpense && parsedExpense.amount != null && parsedExpense.description && (
+        <div className="space-y-2 sm:space-y-3 rounded-lg sm:rounded-xl border border-border/60 bg-card p-3 sm:p-4 shadow-sm">
+          {/* Mobile: Stack vertically, Desktop: Single line */}
+          <div className="space-y-2 sm:space-y-0 sm:flex sm:items-center sm:justify-between">
+            {/* Main expense info */}
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs sm:text-sm">
+              <span className="text-base sm:text-lg">
                 {CATEGORY_ICONS[parsedExpense.category]}
               </span>
               <span className="font-semibold text-foreground">
                 ${parsedExpense.amount.toFixed(2)}
               </span>
               <span className="text-muted-foreground">for</span>
-              <span className="text-foreground">{parsedExpense.description}</span>
-              <span className="text-muted-foreground">•</span>
-              <span className="capitalize text-muted-foreground">
-                {parsedExpense.category}
-              </span>
-              <span className="text-muted-foreground">•</span>
-              <span className="text-muted-foreground">
-                {formatDate(parsedExpense.date)}
-              </span>
+              <span className="font-medium text-foreground">{parsedExpense.description}</span>
+
+              {/* Metadata on new line on mobile */}
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1 w-full sm:w-auto sm:contents">
+                <span className="hidden sm:inline text-muted-foreground">•</span>
+                <span className="capitalize text-muted-foreground">
+                  {parsedExpense.category}
+                </span>
+                <span className="text-muted-foreground">•</span>
+                <span className="text-muted-foreground text-[10px] sm:text-xs">
+                  {formatDate(parsedExpense.date)}
+                </span>
+              </div>
             </div>
+
+            {/* Parse time */}
             {parseTime !== null && (
-              <span className="text-xs text-muted-foreground">
+              <span className="text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap">
                 {parseTime}ms
               </span>
             )}
           </div>
 
           {status === "saving" && (
-            <p className="text-xs text-muted-foreground">
+            <p className="text-[10px] sm:text-xs text-muted-foreground">
               Saving to database...
             </p>
           )}
           {status === "saved" && (
-            <div className="flex items-center gap-1.5 text-xs text-green-600">
+            <div className="flex items-center gap-1.5 text-[10px] sm:text-xs text-green-600">
               <Check className="h-3 w-3" />
               <span>Saved successfully!</span>
             </div>
           )}
 
           {/* Debug Mode - JSON Output */}
-          <details className="mt-3">
-            <summary className="cursor-pointer text-xs text-muted-foreground hover:text-foreground">
+          <details className="mt-2 sm:mt-3">
+            <summary className="cursor-pointer text-[10px] sm:text-xs text-muted-foreground hover:text-foreground">
               Debug Output
             </summary>
-            <pre className="mt-2 overflow-x-auto rounded-lg bg-muted p-3 text-xs">
+            <pre className="mt-2 overflow-x-auto rounded-lg bg-muted p-2 sm:p-3 text-[10px] sm:text-xs">
               {JSON.stringify(parsedExpense, null, 2)}
             </pre>
           </details>
@@ -270,9 +280,9 @@ export function HomeInput() {
       )}
 
       {error && (
-        <div className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-600 dark:border-red-900 dark:bg-red-950">
-          <AlertCircle className="h-4 w-4" />
-          <span>{error}</span>
+        <div className="flex items-start gap-2 rounded-lg sm:rounded-xl border border-red-200 bg-red-50 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm text-red-600 dark:border-red-900 dark:bg-red-950">
+          <AlertCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0 mt-0.5" />
+          <span className="flex-1">{error}</span>
         </div>
       )}
 

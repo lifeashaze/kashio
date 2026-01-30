@@ -110,28 +110,28 @@ export function ExpenseInputDemo() {
   return (
     <div className="relative w-full max-w-5xl">
       {/* Split view container */}
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-3 sm:gap-4 md:grid-cols-2">
         {/* Left side - Input */}
-        <div className="relative overflow-hidden rounded-2xl border border-border bg-card shadow-xl">
+        <div className="relative overflow-hidden rounded-xl sm:rounded-2xl border border-border bg-card shadow-xl">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-chart-1/5" />
 
-          <div className="relative p-6">
-            <div className="mb-4">
-              <h3 className="text-sm font-semibold text-foreground">You type</h3>
-              <p className="text-xs text-muted-foreground">Natural language, no forms</p>
+          <div className="relative p-4 sm:p-6">
+            <div className="mb-3 sm:mb-4">
+              <h3 className="text-xs sm:text-sm font-semibold text-foreground">You type</h3>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">Natural language, no forms</p>
             </div>
 
             <div className="space-y-3">
-              <div className="rounded-xl border border-border bg-background p-4">
+              <div className="rounded-lg sm:rounded-xl border border-border bg-background p-3 sm:p-4">
                 <div className="flex items-center gap-2">
                   <input
-                    className="flex-1 bg-transparent text-lg font-medium text-foreground placeholder:text-muted-foreground focus:outline-none"
+                    className="flex-1 bg-transparent text-sm sm:text-base md:text-lg font-medium text-foreground placeholder:text-muted-foreground focus:outline-none"
                     value={displayText}
                     placeholder="Type an expense..."
                     readOnly
                   />
                   {isTyping && displayText && (
-                    <div className="h-5 w-0.5 animate-pulse bg-primary" />
+                    <div className="h-4 sm:h-5 w-0.5 animate-pulse bg-primary" />
                   )}
                 </div>
               </div>
@@ -140,59 +140,59 @@ export function ExpenseInputDemo() {
         </div>
 
         {/* Right side - Parsed result */}
-        <div className="relative overflow-hidden rounded-2xl border border-border bg-card shadow-xl">
+        <div className="relative overflow-hidden rounded-xl sm:rounded-2xl border border-border bg-card shadow-xl">
           <div className="absolute inset-0 bg-gradient-to-br from-chart-2/5 via-transparent to-primary/5" />
 
-          <div className="relative p-6">
-            <div className="mb-4 flex items-center justify-between">
-              <div>
-                <h3 className="text-sm font-semibold text-foreground">We understand</h3>
-                <p className="text-xs text-muted-foreground">Automatically parsed</p>
+          <div className="relative p-4 sm:p-6">
+            <div className="mb-3 sm:mb-4 flex items-center justify-between gap-2">
+              <div className="min-w-0">
+                <h3 className="text-xs sm:text-sm font-semibold text-foreground">We understand</h3>
+                <p className="text-[10px] sm:text-xs text-muted-foreground">Automatically parsed</p>
               </div>
               {isProcessing && (
-                <div className="flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary animate-in fade-in duration-300">
-                  <Loader2 className="h-3 w-3 animate-spin" />
+                <div className="flex items-center gap-1 sm:gap-1.5 rounded-full bg-primary/10 px-2 sm:px-2.5 py-0.5 sm:py-1 text-[10px] sm:text-xs font-medium text-primary animate-in fade-in duration-300 whitespace-nowrap">
+                  <Loader2 className="h-2.5 w-2.5 sm:h-3 sm:w-3 animate-spin" />
                   Parsing
                 </div>
               )}
               {showResult && (
-                <div className="flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary animate-in fade-in slide-in-from-right-2 duration-300">
-                  <Check className="h-3 w-3" />
+                <div className="flex items-center gap-1 sm:gap-1.5 rounded-full bg-primary/10 px-2 sm:px-2.5 py-0.5 sm:py-1 text-[10px] sm:text-xs font-medium text-primary animate-in fade-in slide-in-from-right-2 duration-300 whitespace-nowrap">
+                  <Check className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                   Added
                 </div>
               )}
             </div>
 
-            <div className="space-y-3">
-              <div className={`rounded-xl border border-border bg-background p-4 transition-all duration-300 ${
+            <div className="space-y-2 sm:space-y-3">
+              <div className={`rounded-lg sm:rounded-xl border border-border bg-background p-3 sm:p-4 transition-all duration-300 ${
                 !showResult ? 'opacity-40 blur-[2px]' : ''
               }`}>
-                <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                <div className="text-[10px] sm:text-xs font-medium uppercase tracking-wider text-muted-foreground">
                   Amount
                 </div>
-                <div className="mt-1 font-mono text-2xl font-bold text-foreground">
+                <div className="mt-1 font-mono text-xl sm:text-2xl font-bold text-foreground">
                   {showResult ? current.result.amount : "$0.00"}
                 </div>
               </div>
 
-              <div className="grid gap-3 grid-cols-2">
-                <div className={`rounded-xl border border-border bg-background p-4 transition-all duration-300 ${
+              <div className="grid gap-2 sm:gap-3 grid-cols-2">
+                <div className={`rounded-lg sm:rounded-xl border border-border bg-background p-2.5 sm:p-4 transition-all duration-300 ${
                   !showResult ? 'opacity-40 blur-[2px]' : ''
                 }`}>
-                  <div className="text-xs font-medium text-muted-foreground">Category</div>
-                  <div className="mt-2 flex items-center gap-2">
-                    <div className={`h-2 w-2 rounded-full transition-colors duration-300 ${showResult ? 'bg-primary' : 'bg-border'}`} />
-                    <div className="text-sm font-semibold text-foreground">
+                  <div className="text-[10px] sm:text-xs font-medium text-muted-foreground">Category</div>
+                  <div className="mt-1.5 sm:mt-2 flex items-center gap-1.5 sm:gap-2">
+                    <div className={`h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full transition-colors duration-300 flex-shrink-0 ${showResult ? 'bg-primary' : 'bg-border'}`} />
+                    <div className="text-xs sm:text-sm font-semibold text-foreground truncate">
                       {showResult ? current.result.category : "—"}
                     </div>
                   </div>
                 </div>
 
-                <div className={`rounded-xl border border-border bg-background p-4 transition-all duration-300 ${
+                <div className={`rounded-lg sm:rounded-xl border border-border bg-background p-2.5 sm:p-4 transition-all duration-300 ${
                   !showResult ? 'opacity-40 blur-[2px]' : ''
                 }`}>
-                  <div className="text-xs font-medium text-muted-foreground">Merchant</div>
-                  <div className="mt-2 text-sm font-semibold text-foreground">
+                  <div className="text-[10px] sm:text-xs font-medium text-muted-foreground">Merchant</div>
+                  <div className="mt-1.5 sm:mt-2 text-xs sm:text-sm font-semibold text-foreground truncate">
                     {showResult ? current.result.merchant : "—"}
                   </div>
                 </div>

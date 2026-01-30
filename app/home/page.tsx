@@ -9,7 +9,8 @@ export default async function HomePage() {
   });
 
   if (!session) {
-    redirect("/login");
+    // Clear invalid session cookie before redirecting
+    redirect("/api/clear-session");
   }
 
   return (

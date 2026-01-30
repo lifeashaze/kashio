@@ -37,20 +37,20 @@ const steps = [
 
 export function HowItWorks() {
   return (
-    <section id="how-it-works" className="relative overflow-hidden px-6 py-24 md:py-32">
+    <section id="how-it-works" className="relative overflow-hidden px-4 sm:px-6 py-16 sm:py-24 md:py-32">
       <div className="relative z-10 mx-auto max-w-7xl">
         {/* Header */}
         <div className="mx-auto max-w-3xl text-center">
-          <h2 className="font-heading text-4xl font-bold tracking-tight text-foreground md:text-5xl lg:text-6xl">
+          <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground">
             How it works
           </h2>
-          <p className="mt-4 text-lg text-muted-foreground md:text-xl">
+          <p className="mt-3 sm:mt-4 text-base sm:text-lg md:text-xl text-muted-foreground">
             Three simple steps to effortless expense tracking
           </p>
         </div>
 
         {/* Steps */}
-        <div className="mt-20 grid gap-8 lg:grid-cols-3">
+        <div className="mt-12 sm:mt-16 md:mt-20 grid gap-6 sm:gap-8 lg:grid-cols-3">
           {steps.map((step, index) => {
             const Icon = step.icon;
             return (
@@ -60,39 +60,39 @@ export function HowItWorks() {
                   <div className="absolute left-1/2 top-8 hidden h-px w-full bg-gradient-to-r from-border via-primary/50 to-border lg:block" />
                 )}
 
-                <div className="relative overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-card to-card/50 p-8">
+                <div className="relative overflow-hidden rounded-xl sm:rounded-2xl border border-border bg-gradient-to-br from-card to-card/50 p-6 sm:p-8">
                   <div className="relative z-10">
                     {/* Number badge */}
-                    <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 ring-1 ring-primary/20">
-                      <span className="font-heading text-lg font-bold text-primary">
+                    <div className="inline-flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-lg sm:rounded-xl bg-primary/10 ring-1 ring-primary/20">
+                      <span className="font-heading text-base sm:text-lg font-bold text-primary">
                         {step.number}
                       </span>
                     </div>
 
                     {/* Icon */}
-                    <div className="mt-6 inline-flex rounded-xl bg-gradient-to-br p-3 ring-1 ring-border">
-                      <Icon className="h-6 w-6 text-primary" />
+                    <div className="mt-4 sm:mt-6 inline-flex rounded-lg sm:rounded-xl bg-gradient-to-br p-2.5 sm:p-3 ring-1 ring-border">
+                      <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                     </div>
 
                     {/* Content */}
-                    <h3 className="mt-6 font-heading text-2xl font-bold text-foreground">
+                    <h3 className="mt-4 sm:mt-6 font-heading text-xl sm:text-2xl font-bold text-foreground">
                       {step.title}
                     </h3>
-                    <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                    <p className="mt-2 sm:mt-3 text-xs sm:text-sm leading-relaxed text-muted-foreground">
                       {step.description}
                     </p>
 
                     {/* Example visual */}
-                    <div className={`mt-6 rounded-xl border border-border/50 bg-gradient-to-br ${step.example.bg} p-4`}>
+                    <div className={`mt-4 sm:mt-6 rounded-lg sm:rounded-xl border border-border/50 bg-gradient-to-br ${step.example.bg} p-3 sm:p-4`}>
                       {step.example.input && (
-                        <div className="font-mono text-sm text-foreground">
+                        <div className="font-mono text-xs sm:text-sm text-foreground">
                           → {step.example.input}
                         </div>
                       )}
                       {step.example.parsed && (
-                        <div className="space-y-2">
+                        <div className="space-y-1.5 sm:space-y-2">
                           {step.example.parsed.map((item, i) => (
-                            <div key={i} className="flex items-center gap-2 text-sm">
+                            <div key={i} className="flex items-center gap-2 text-xs sm:text-sm">
                               <div className="h-1.5 w-1.5 rounded-full bg-primary" />
                               <span className="font-medium text-foreground">{item}</span>
                             </div>
@@ -101,7 +101,7 @@ export function HowItWorks() {
                       )}
                       {step.example.chart && (
                         <div className="space-y-2">
-                          <div className="flex items-center justify-between text-xs">
+                          <div className="flex items-center justify-between text-[10px] sm:text-xs">
                             <span className="text-muted-foreground">This week</span>
                             <span className="font-mono font-semibold text-foreground">$487</span>
                           </div>
