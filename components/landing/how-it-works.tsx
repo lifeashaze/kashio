@@ -17,7 +17,7 @@ const steps = [
     number: "02",
     icon: Sparkles,
     title: "AI parses instantly",
-    description: "Our AI extracts everything—amount, category, merchant, splits, context—in milliseconds. Zero manual work required.",
+    description: "Our AI extracts everything (amount, category, merchant, splits, context) in milliseconds. Zero manual work required.",
     example: {
       parsed: ["$45.00", "Dining", "Business lunch"],
       bg: "from-primary/10 to-primary/5",

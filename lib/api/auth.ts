@@ -1,9 +1,6 @@
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
-/**
- * Session with user information
- */
 export type AuthSession = {
   session: {
     id: string;
@@ -24,25 +21,11 @@ export type AuthSession = {
   };
 };
 
-/**
- * Result of session validation
- */
 export type SessionResult =
   | { success: true; session: AuthSession }
   | { success: false; response: Response };
 
-/**
- * Validates the current session and returns either the session or an error response
- *
- * Usage in API routes:
- * ```typescript
- * const result = await requireAuth();
- * if (!result.success) return result.response;
- * const { session } = result;
- * ```
- *
- * @returns Session if authenticated, or error Response if not
- */
+
 export async function requireAuth(): Promise<SessionResult> {
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -58,12 +41,6 @@ export async function requireAuth(): Promise<SessionResult> {
   return { success: true, session };
 }
 
-/**
- * Gets the current session without throwing/returning error
- * Useful for optional authentication scenarios
- *
- * @returns Session if authenticated, null if not
- */
 export async function getSession(): Promise<AuthSession | null> {
   return auth.api.getSession({
     headers: await headers(),

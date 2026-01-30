@@ -1,15 +1,8 @@
-/**
- * AI prompts for expense parsing
- */
-
 interface ExpenseParserPromptParams {
   currentDateTime: string;
   currentISO: string;
 }
 
-/**
- * Generate the system prompt for expense parsing
- */
 export function getExpenseParserPrompt({
   currentDateTime,
   currentISO,
@@ -54,18 +47,13 @@ DATE HANDLING (YYYY-MM-DDTHH:mm:ss format):
 Categories: food, transport, entertainment, shopping, bills, health, groceries, travel, education, other.`;
 }
 
-/**
- * User-friendly descriptions for confidence levels and missing fields
- */
 export const CONFIDENCE_MESSAGES = {
   high: "I'm confident about this expense",
   medium: "I made some assumptions about this expense",
   low: "I need more information to understand this expense",
 } as const;
 
-/**
- * Generate a user-friendly message for the confirmation dialog
- */
+
 export function getConfirmationMessage(
   confidence: "high" | "medium" | "low",
   missingFields: string[],

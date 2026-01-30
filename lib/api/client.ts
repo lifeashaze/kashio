@@ -1,6 +1,3 @@
-/**
- * API Client utilities for making HTTP requests with consistent error handling
- */
 
 export class ApiError extends Error {
   constructor(
@@ -17,16 +14,12 @@ interface RequestOptions extends RequestInit {
   params?: Record<string, string>;
 }
 
-/**
- * Make a typed API request with automatic error handling
- */
 async function request<T>(
   endpoint: string,
   options: RequestOptions = {}
 ): Promise<T> {
   const { params, ...init } = options;
 
-  // Build URL with query parameters
   const url = new URL(endpoint, window.location.origin);
   if (params) {
     Object.entries(params).forEach(([key, value]) => {
@@ -54,9 +47,6 @@ async function request<T>(
   return response.json();
 }
 
-/**
- * API client with common HTTP methods
- */
 export const apiClient = {
   get: <T>(endpoint: string, options?: RequestOptions) =>
     request<T>(endpoint, { ...options, method: "GET" }),

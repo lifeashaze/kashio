@@ -79,16 +79,14 @@ export function HomeNav({ user }: HomeNavProps) {
                     </div>
                   </div>
                   <div className="p-2">
-                    <button
+                    <Link
+                      href="/profile"
                       className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
-                      onClick={() => {
-                        setShowMenu(false);
-                        // Future: navigate to profile page
-                      }}
+                      onClick={() => setShowMenu(false)}
                     >
                       <User className="size-4" />
                       Profile
-                    </button>
+                    </Link>
                     <button
                       className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground disabled:opacity-50"
                       onClick={handleSignOut}
