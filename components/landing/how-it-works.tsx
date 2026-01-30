@@ -37,7 +37,7 @@ const steps = [
 
 export function HowItWorks() {
   return (
-    <section id="how-it-works" className="relative overflow-hidden px-4 sm:px-6 py-16 sm:py-24 md:py-32">
+    <section id="how-it-works" className="relative overflow-hidden px-4 sm:px-6 py-16 sm:py-24 md:py-32" aria-label="How it works">
       <div className="relative z-10 mx-auto max-w-7xl">
         {/* Header */}
         <div className="mx-auto max-w-3xl text-center">
@@ -71,7 +71,7 @@ export function HowItWorks() {
 
                     {/* Icon */}
                     <div className="mt-4 sm:mt-6 inline-flex rounded-lg sm:rounded-xl bg-gradient-to-br p-2.5 sm:p-3 ring-1 ring-border">
-                      <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                      <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-primary" aria-hidden="true" />
                     </div>
 
                     {/* Content */}
@@ -114,7 +114,7 @@ export function HowItWorks() {
                   </div>
 
                   {/* Background gradient */}
-                  <div className={`pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-gradient-to-br ${step.example.bg} blur-[60px]`} />
+                  <div className={`pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-gradient-to-br ${step.example.bg} blur-[60px]`} aria-hidden="true" />
                 </div>
               </div>
             );
@@ -123,7 +123,7 @@ export function HowItWorks() {
       </div>
 
       {/* Background decoration */}
-      <div className="pointer-events-none absolute inset-0 -z-10">
+      <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
         <div className="absolute left-1/4 top-1/4 h-[400px] w-[400px] rounded-full bg-primary/10 blur-[100px]" />
         <div className="absolute bottom-1/4 right-1/4 h-[400px] w-[400px] rounded-full bg-chart-2/10 blur-[100px]" />
       </div>

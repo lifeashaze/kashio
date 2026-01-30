@@ -3,44 +3,18 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
 import Link from "next/link";
-import { authClient } from "@/lib/auth-client";
-import { useState, useEffect } from "react";
+import { useSession } from "@/lib/session-context";
 
 export function CTA() {
-  const [session, setSession] = useState<{ user: { name: string; email: string } } | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { session, isLoading } = useSession();
 
-  useEffect(() => {
-    let mounted = true;
-
-    const fetchSession = async () => {
-      try {
-        const { data } = await authClient.getSession();
-        if (mounted) {
-          setSession(data);
-          setIsLoading(false);
-        }
-      } catch (error) {
-        if (mounted) {
-          setSession(null);
-          setIsLoading(false);
-        }
-      }
-    };
-
-    fetchSession();
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
   return (
-    <section className="relative overflow-hidden px-4 sm:px-6 py-16 sm:py-24 md:py-32">
+    <section className="relative overflow-hidden px-4 sm:px-6 py-16 sm:py-24 md:py-32" aria-label="Call to action">
       <div className="relative z-10 mx-auto max-w-4xl">
         <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-border bg-card p-8 sm:p-12 md:p-16">
           <div className="relative z-10 text-center">
             <div className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full border border-primary/20 bg-primary/10 px-2.5 sm:px-3 py-1 text-xs font-medium text-primary">
-              <Sparkles className="h-3 w-3" />
+              <Sparkles className="h-3 w-3" aria-hidden="true" />
               Get started today
             </div>
 
@@ -61,7 +35,7 @@ export function CTA() {
                     asChild
                   >
                     <Link href="/home" className="cursor-pointer">
-                      Dashboard <ArrowRight className="ml-2 h-4 w-4" />
+                      Dashboard <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
                     </Link>
                   </Button>
                 ) : (
@@ -72,7 +46,7 @@ export function CTA() {
                       asChild
                     >
                       <Link href="/signup" className="cursor-pointer">
-                        Get started free <ArrowRight className="ml-2 h-4 w-4" />
+                        Get started free <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
                       </Link>
                     </Button>
                     <Button
@@ -90,8 +64,8 @@ export function CTA() {
           </div>
 
           {/* Decorative gradients */}
-          <div className="pointer-events-none absolute -left-20 top-0 h-60 w-60 rounded-full bg-primary/20 blur-[100px]" />
-          <div className="pointer-events-none absolute -right-20 bottom-0 h-60 w-60 rounded-full bg-chart-1/20 blur-[100px]" />
+          <div className="pointer-events-none absolute -left-20 top-0 h-60 w-60 rounded-full bg-primary/20 blur-[100px]" aria-hidden="true" />
+          <div className="pointer-events-none absolute -right-20 bottom-0 h-60 w-60 rounded-full bg-chart-1/20 blur-[100px]" aria-hidden="true" />
         </div>
       </div>
     </section>

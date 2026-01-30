@@ -4,7 +4,7 @@ import { ArrowRight } from "lucide-react";
 
 export function ProductShowcase() {
   return (
-    <section className="relative overflow-hidden px-4 sm:px-6 py-16 sm:py-24 md:py-32">
+    <section className="relative overflow-hidden px-4 sm:px-6 py-16 sm:py-24 md:py-32" aria-label="Product showcase">
       <div className="relative z-10 mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-12 sm:mb-16 md:mb-20">
@@ -32,7 +32,7 @@ export function ProductShowcase() {
               </p>
             </div>
 
-            <div className="hidden lg:flex lg:justify-center">
+            <div className="hidden lg:flex lg:justify-center" aria-hidden="true">
               <ArrowRight className="h-6 w-6 text-primary" />
             </div>
 
@@ -90,7 +90,7 @@ export function ProductShowcase() {
               </div>
             </div>
 
-            <div className="order-1 hidden lg:order-2 lg:flex lg:justify-center">
+            <div className="order-1 hidden lg:order-2 lg:flex lg:justify-center" aria-hidden="true">
               <ArrowRight className="h-6 w-6 text-primary" />
             </div>
 
@@ -121,7 +121,7 @@ export function ProductShowcase() {
               </p>
             </div>
 
-            <div className="hidden lg:flex lg:justify-center">
+            <div className="hidden lg:flex lg:justify-center" aria-hidden="true">
               <ArrowRight className="h-6 w-6 text-primary" />
             </div>
 
