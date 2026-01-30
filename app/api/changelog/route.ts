@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { changelog } from "@/lib/schema";
 import { desc } from "drizzle-orm";
-import { NextResponse } from "next/server";
+import { badRequest, created, success, serverError } from "@/lib/api/responses";
 
 export async function GET() {
   try {
@@ -10,13 +10,9 @@ export async function GET() {
       .from(changelog)
       .orderBy(desc(changelog.date));
 
-    return NextResponse.json(entries);
+    return success(entries);
   } catch (error) {
-    console.error("Failed to fetch changelog:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch changelog" },
-      { status: 500 }
-    );
+    return serverError("Failed to fetch changelog", error);
   }
 }
 
@@ -26,10 +22,7 @@ export async function POST(request: Request) {
     const { date, content } = body;
 
     if (!content) {
-      return NextResponse.json(
-        { error: "Content is required" },
-        { status: 400 }
-      );
+      return badRequest("Content is required");
     }
 
     const [entry] = await db
@@ -40,13 +33,9 @@ export async function POST(request: Request) {
       })
       .returning();
 
-    return NextResponse.json(entry, { status: 201 });
+    return created(entry);
   } catch (error) {
-    console.error("Failed to create changelog entry:", error);
-    return NextResponse.json(
-      { error: "Failed to create changelog entry" },
-      { status: 500 }
-    );
+    return serverError("Failed to create changelog entry", error);
   }
 }
 

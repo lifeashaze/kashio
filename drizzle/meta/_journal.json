@@ -15,6 +15,13 @@
       "when": 1767098960744,
       "tag": "0001_nifty_talkback",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1769716389230,
+      "tag": "0002_medical_mastermind",
+      "breakpoints": true
     }
   ]
 }

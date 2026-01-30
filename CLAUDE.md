@@ -53,6 +53,8 @@ The app uses Better Auth with a centralized authentication architecture:
 
 **Schema Organization**:
 - `lib/schema.ts` - Main schema file that re-exports auth schema and defines app models
+  - `changelog` table - Changelog entries with date and content
+  - `expenses` table - User expenses with amount, description, category, date, and rawInput
 - `lib/auth-schema.ts` - Better Auth tables (user, session, account, verification)
 - Drizzle config (`drizzle.config.ts`) points to `lib/schema.ts` for migrations
 
@@ -72,6 +74,8 @@ The app uses Better Auth with a centralized authentication architecture:
 **Feature Components**:
 - `components/auth/` - Authentication forms
 - `components/home/` - Dashboard and expense input interface
+  - `home-input.tsx` - Natural language expense input with two-tier validation
+  - `expense-confirmation-dialog.tsx` - Review/edit dialog for low-confidence parses
 - `components/landing/` - Landing page sections (hero, features, CTA, footer)
 
 **Client vs Server Components**:
@@ -83,8 +87,11 @@ The app uses Better Auth with a centralized authentication architecture:
 
 ```
 app/
-├── api/auth/[...all]/route.ts    # Auth API catchall (handles all Better Auth endpoints)
-├── api/changelog/route.ts         # Changelog CRUD API
+├── api/
+│   ├── auth/[...all]/route.ts    # Auth API catchall (handles all Better Auth endpoints)
+│   ├── changelog/route.ts         # Changelog CRUD API
+│   ├── expenses/route.ts          # Expense CRUD API (GET: fetch user expenses, POST: create expense)
+│   └── parse-expense/route.ts     # AI-powered natural language expense parser
 ├── page.tsx                       # Landing page (public, server component)
 ├── home/page.tsx                  # Dashboard (protected, client component)
 ├── login/page.tsx                 # Login page (public, client component)
@@ -109,9 +116,10 @@ app/
 Required environment variables (create `.env.local`):
 
 ```
-DATABASE_URL="postgresql://..."           # PostgreSQL connection string
-BETTER_AUTH_SECRET="random-secret-key"    # Session encryption key
-BETTER_AUTH_URL="http://localhost:3000"   # Auth base URL
+DATABASE_URL="postgresql://..."                      # PostgreSQL connection string
+BETTER_AUTH_SECRET="random-secret-key"               # Session encryption key
+BETTER_AUTH_URL="http://localhost:3000"              # Auth base URL
+GROQ_API_KEY="..."                                    # Groq API key for expense parsing (gemma2-9b-it)
 
 # OAuth (optional, for social login)
 GITHUB_CLIENT_ID="..."
@@ -212,6 +220,167 @@ await authClient.signIn.social({
 // Sign out
 await authClient.signOut();
 ```
+
+### AI Validation Pattern
+
+The expense tracking feature implements a reusable two-tier validation pattern for AI-powered inputs:
+
+**Pattern Structure**:
+1. **AI returns validation metadata** (isValid, confidence, missingFields, reasoning)
+2. **Frontend routes based on state**:
+   - Invalid → Error message with examples
+   - Missing critical fields → Error with specific guidance
+   - Low/medium confidence → Confirmation dialog
+   - High confidence → Auto-complete action
+
+**Implementation Template**:
+```typescript
+// 1. Define schema with validation (in API route)
+const schema = z.object({
+  isValid: z.boolean(),
+  confidence: z.enum(["high", "medium", "low"]),
+  data: z.object({ /* actual data */ }).nullable(),
+  missingFields: z.array(z.string()),
+  reasoning: z.string(),
+});
+
+// 2. Handle in frontend
+if (!result.isValid) {
+  showError(result.reasoning + " Try: [examples]");
+} else if (result.missingFields.includes("critical-field")) {
+  showError("Missing critical field...");
+} else if (result.confidence !== "high" || result.missingFields.length > 0) {
+  showConfirmationDialog(result);
+} else {
+  autoComplete(result.data);
+}
+```
+
+### Expense Tracking
+
+The app features AI-powered natural language expense parsing using Groq (Gemma 2 9B IT) with a **two-tier validation approach** that handles invalid inputs, missing fields, and uncertain parses gracefully.
+
+#### Two-Tier Validation Flow
+
+**Tier 1: AI-Level Validation**
+
+The AI validates input and returns confidence metrics before any data is saved:
+
+```typescript
+// POST /api/parse-expense
+const response = await fetch("/api/parse-expense", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ prompt: "lunch at chipotle $15" }),
+});
+
+// Returns validation + structured data:
+// {
+//   isValidExpense: true,
+//   confidence: "high",  // "high" | "medium" | "low"
+//   amount: 15,
+//   description: "lunch at chipotle",
+//   category: "food",
+//   date: "2026-01-30T12:00:00",
+//   missingFields: [],  // e.g., ["amount", "description"]
+//   reasoning: "Clear amount and description provided..."
+// }
+```
+
+**Validation Fields**:
+- `isValidExpense` - `false` for greetings, questions, or non-expense text
+- `confidence` - "high" (all clear), "medium" (some inference), "low" (missing critical info)
+- `missingFields` - Array of fields that couldn't be extracted: `["amount", "description", "category"]`
+- `amount` / `description` - Nullable (null if not found in input)
+- `reasoning` - Explains confidence level and missing/inferred information
+
+**Tier 2: Frontend Handling**
+
+The UI handles different validation states (`components/home/home-input.tsx`):
+
+1. **Not an expense** (`isValidExpense: false`) → Show error with examples
+2. **Missing amount** → Show error (amount is critical, can't proceed)
+3. **Low/medium confidence or missing fields** → Show confirmation dialog
+4. **High confidence** → Auto-save with quick preview
+
+**Parsing Features**:
+- Uses Groq's Gemma 2 9B IT with structured outputs (Zod schema)
+- Categorizes into: food, transport, entertainment, shopping, bills, health, groceries, travel, education, other
+- Infers date/time from context (e.g., "lunch" → 12:00, "dinner" → 19:00)
+- Supports relative dates ("yesterday", "last week")
+- Detects invalid inputs (greetings, gibberish, questions)
+- Alternative models: `llama-3.3-70b-versatile`, `llama-3.1-70b-versatile` (supports structured outputs)
+
+#### Confirmation Dialog
+
+When the AI has low/medium confidence or missing fields, a confirmation dialog (`components/home/expense-confirmation-dialog.tsx`) allows users to review and edit:
+
+```typescript
+<ExpenseConfirmationDialog
+  open={showDialog}
+  onOpenChange={setShowDialog}
+  parsedExpense={parsed}  // Contains validation metadata
+  onConfirm={(expense) => saveExpense(expense, rawInput)}
+  onCancel={() => setShowDialog(false)}
+/>
+```
+
+The dialog:
+- Pre-fills fields with parsed values (empty for null values)
+- Highlights missing fields in red with asterisks
+- Auto-focuses first missing field
+- Shows AI reasoning at the top
+- Validates before allowing save (amount > 0, description non-empty)
+- Allows editing all fields (amount, description, category, date/time)
+
+#### Example Validation Flows
+
+```typescript
+// 1. Invalid input
+"hello" → { isValidExpense: false } → Error message
+
+// 2. Missing amount (critical field)
+"bought coffee" → { missingFields: ["amount"] } → Error message
+
+// 3. Missing description
+"$15" → { amount: 15, description: null, confidence: "low" } → Confirmation dialog
+
+// 4. Medium confidence (inference needed)
+"lunch $12" → { confidence: "medium" } → Confirmation dialog
+
+// 5. High confidence (clear input)
+"$15 chipotle lunch" → { confidence: "high" } → Auto-save with preview
+```
+
+**2. Save Expense** (`/api/expenses`):
+```typescript
+// POST /api/expenses (authenticated)
+await fetch("/api/expenses", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    amount: 15,
+    description: "lunch at chipotle",
+    category: "food",
+    date: "2026-01-30T12:00:00",
+    rawInput: "lunch at chipotle $15",
+  }),
+});
+
+// GET /api/expenses (authenticated)
+const expenses = await fetch("/api/expenses").then(r => r.json());
+// Returns array of user's expenses, ordered by date descending
+```
+
+**Database Schema** (`expenses` table):
+- `id` - UUID primary key
+- `userId` - User ID (text, links to auth user)
+- `amount` - Numeric(10, 2) for currency precision
+- `description` - Text description of expense
+- `category` - Text category (food, transport, etc.)
+- `date` - Timestamp of when expense occurred
+- `rawInput` - Original natural language input
+- `createdAt` - Timestamp of record creation
 
 ## Important Notes
 
