@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Space_Grotesk, Inter } from "next/font/google";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/theme-provider";
+import { QueryProvider } from "@/components/providers/query-provider";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -52,8 +53,10 @@ export default function RootLayout({
           Skip to main content
         </a>
         <ThemeProvider>
-          {children}
-          <Toaster richColors />
+          <QueryProvider>
+            {children}
+            <Toaster richColors />
+          </QueryProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -13,7 +13,7 @@ export function HomeHeader({ user }: HomeHeaderProps) {
         Welcome back, {firstName}.
       </h1>
       <p className="text-sm text-muted-foreground md:text-base">
-        Just type what you spent. Kashio will parse the rest.
+        Just type what you spent. Kashio will handle the rest.
       </p>
     </div>
   );

@@ -9,6 +9,11 @@ Kashio is a full-stack expense tracking application built with Next.js 16 (App R
 ## Development Commands
 
 ```bash
+# Package Management
+bun install              # Install dependencies (use bun, NOT npm)
+bun add <package>        # Add a new dependency
+bun remove <package>     # Remove a dependency
+
 # Development
 npm run dev              # Start Next.js dev server at http://localhost:3000
 
@@ -24,6 +29,8 @@ npm run build            # Create production build
 npm run start            # Run production server
 npm run lint             # Run ESLint
 ```
+
+**Important**: Always use `bun` for package management (install/add/remove), not `npm install`. This avoids peer dependency conflicts and ensures consistency.
 
 ## Architecture
 
@@ -263,6 +270,57 @@ await authClient.signIn.social({
 // Sign out
 await authClient.signOut();
 ```
+
+### Data Fetching with TanStack Query
+
+The app uses TanStack Query (React Query) for server state management, providing automatic caching, deduplication, and background refetching.
+
+**Setup**:
+- Query provider configured in `app/layout.tsx` wrapping the entire app
+- Query hooks defined in `lib/hooks/use-expenses.ts`
+- Default stale time: 60 seconds
+- Automatic cache invalidation on mutations
+
+**Usage Pattern**:
+```typescript
+"use client";
+import { useExpenses, useCreateExpense, useUpdateExpense } from "@/lib/hooks/use-expenses";
+
+function MyComponent() {
+  // Fetching data
+  const { data: expenses, isLoading, error } = useExpenses();
+
+  // Creating data
+  const createExpense = useCreateExpense();
+  await createExpense.mutateAsync({
+    amount: 15,
+    description: "lunch",
+    category: "food",
+    date: new Date().toISOString(),
+    rawInput: "lunch $15",
+  });
+
+  // Updating data
+  const updateExpense = useUpdateExpense();
+  await updateExpense.mutateAsync({
+    id: "expense-id",
+    data: { amount: 20, description: "dinner", category: "food", date: "..." },
+  });
+}
+```
+
+**Benefits**:
+- No duplicate API calls on page load (automatic request deduplication)
+- Automatic cache invalidation when data is created/updated/deleted
+- Loading and error states handled automatically
+- Background refetching keeps data fresh
+- Toast notifications on success/error built into mutations
+
+**Adding New Query Hooks**:
+1. Define query keys following the pattern in `lib/hooks/use-expenses.ts`
+2. Create query hooks using `useQuery` for fetching
+3. Create mutation hooks using `useMutation` for creating/updating/deleting
+4. Invalidate relevant queries in mutation `onSuccess` callbacks
 
 ### AI Validation Pattern
 

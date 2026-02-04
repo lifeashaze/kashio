@@ -38,7 +38,7 @@ async function request<T>(
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
     throw new ApiError(
-      error.message || `Request failed with status ${response.status}`,
+      error.error || `Request failed with status ${response.status}`,
       response.status,
       error
     );

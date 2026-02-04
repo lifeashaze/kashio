@@ -12,8 +12,10 @@ import {
 } from "@/lib/constants/timing";
 import type { ParsedExpense, ValidatedExpense } from "@/lib/types/expense";
 import { apiClient, ApiError } from "@/lib/api/client";
+import { useCreateExpense } from "@/lib/hooks/use-expenses";
 
 export function HomeInput() {
+  const createExpense = useCreateExpense();
   const [input, setInput] = useState("");
   const [status, setStatus] = useState<
     "idle" | "parsing" | "saving" | "saved" | "error"
@@ -31,7 +33,7 @@ export function HomeInput() {
     try {
       setStatus("saving");
 
-      await apiClient.post("/api/expenses", {
+      await createExpense.mutateAsync({
         amount: expense.amount,
         description: expense.description,
         category: expense.category,
@@ -183,7 +185,7 @@ export function HomeInput() {
               value={input}
               onChange={(event) => setInput(event.target.value)}
               placeholder="Type an expense... e.g. 'Coffee $5'"
-              className="w-full resize-none bg-transparent px-2 sm:px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none md:text-base"
+              className="w-full resize-none bg-transparent px-2 sm:px-3 py-2 text-base text-foreground placeholder:text-muted-foreground focus:outline-none"
               autoFocus
               disabled={isLoading}
             />
