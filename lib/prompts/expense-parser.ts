@@ -1,13 +1,11 @@
 interface ExpenseParserPromptParams {
-  currentDateTime: string;
-  currentISO: string;
+  currentDate: string;
 }
 
 export function getExpenseParserPrompt({
-  currentDateTime,
-  currentISO,
+  currentDate,
 }: ExpenseParserPromptParams): string {
-  return `Parse expense to JSON with validation. Current datetime: ${currentDateTime} (${currentISO} in ISO format).
+  return `Parse expense to JSON with validation. Current date: ${currentDate} (YYYY-MM-DD).
 
 VALIDATION RULES:
 1. Set isValidExpense=false if input is:
@@ -36,13 +34,14 @@ EXAMPLES:
 - "$50" → isValidExpense=true, confidence="low", amount=50, description=null, missingFields=["description"]
 - "$15 chipotle" → isValidExpense=true, confidence="high", amount=15, description="chipotle", missingFields=[]
 
-DATE HANDLING (YYYY-MM-DDTHH:mm:ss format):
-- DEFAULT: If NO time mentioned in input, use EXACT current time: ${currentISO}
-- ONLY infer different times if explicitly mentioned:
-  - "lunch" → same date at 12:00:00
-  - "dinner" → same date at 19:00:00
-  - "breakfast" → same date at 08:00:00
-- If "yesterday" or relative date, adjust date but use current time unless time is specified
+DATE HANDLING (YYYY-MM-DD format only):
+- Always return date only (no time)
+- DEFAULT: If no date is mentioned, use ${currentDate}
+- If relative date is mentioned, resolve to the correct date:
+  - "yesterday" -> one day before ${currentDate}
+  - "today" -> ${currentDate}
+  - "last Friday" -> the most recent Friday before or on ${currentDate}
+- Ignore time-of-day phrases ("morning", "lunch", "dinner") since this app tracks date only
 
 Categories: food, transport, entertainment, shopping, bills, health, groceries, travel, education, other.`;
 }

@@ -10,6 +10,7 @@ import {
   ERROR_DISPLAY_DURATION,
   VALIDATION_ERROR_DURATION,
 } from "@/lib/constants/timing";
+import { formatRelativeDateLabel } from "@/lib/date";
 import type { ParsedExpense, ValidatedExpense } from "@/lib/types/expense";
 import { apiClient, ApiError } from "@/lib/api/client";
 import { useCreateExpense } from "@/lib/hooks/use-expenses";
@@ -20,7 +21,6 @@ export function HomeInput() {
   const [status, setStatus] = useState<
     "idle" | "parsing" | "saving" | "saved" | "error"
   >("idle");
-  const [startTime, setStartTime] = useState<number | null>(null);
   const [parseTime, setParseTime] = useState<number | null>(null);
   const [parsedExpense, setParsedExpense] = useState<ParsedExpense | null>(
     null
@@ -28,6 +28,25 @@ export function HomeInput() {
   const [error, setError] = useState<string | null>(null);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [currentRawInput, setCurrentRawInput] = useState("");
+
+  const scheduleReset = (duration: number) => {
+    setTimeout(() => {
+      setStatus("idle");
+      setError(null);
+    }, duration);
+  };
+
+  const resolveErrorMessage = (error: unknown) => {
+    if (error instanceof ApiError) return error.message;
+    if (error instanceof Error) return error.message;
+    return "Unknown error";
+  };
+
+  const showValidationError = (message: string) => {
+    setError(message);
+    setStatus("error");
+    scheduleReset(VALIDATION_ERROR_DURATION);
+  };
 
   const saveExpense = async (expense: ValidatedExpense, rawInput: string) => {
     try {
@@ -47,20 +66,10 @@ export function HomeInput() {
         setStatus("idle");
         setParsedExpense(null);
       }, SUCCESS_DISPLAY_DURATION);
-    } catch (err) {
-      console.error("Error:", err);
-      setError(
-        err instanceof ApiError
-          ? err.message
-          : err instanceof Error
-            ? err.message
-            : "Unknown error"
-      );
+    } catch (error) {
+      setError(resolveErrorMessage(error));
       setStatus("error");
-      setTimeout(() => {
-        setStatus("idle");
-        setError(null);
-      }, ERROR_DISPLAY_DURATION);
+      scheduleReset(ERROR_DISPLAY_DURATION);
     }
   };
 
@@ -72,7 +81,6 @@ export function HomeInput() {
     const currentInput = trimmed;
     setCurrentRawInput(currentInput);
     const start = Date.now();
-    setStartTime(start);
     setParseTime(null);
     setParsedExpense(null);
     setError(null);
@@ -90,27 +98,17 @@ export function HomeInput() {
 
       // Case 1: Not an expense at all
       if (!parsed.isValidExpense) {
-        setError(
+        showValidationError(
           `${parsed.reasoning} Try something like: "$15 lunch at chipotle" or "coffee $5 this morning"`
         );
-        setStatus("error");
-        setTimeout(() => {
-          setStatus("idle");
-          setError(null);
-        }, VALIDATION_ERROR_DURATION);
         return;
       }
 
       // Case 2: Missing amount (critical field)
       if (parsed.missingFields.includes("amount")) {
-        setError(
+        showValidationError(
           "I couldn't find an amount. Please include how much you spent (e.g., '$15' or '15 dollars')"
         );
-        setStatus("error");
-        setTimeout(() => {
-          setStatus("idle");
-          setError(null);
-        }, VALIDATION_ERROR_DURATION);
         return;
       }
 
@@ -136,45 +134,15 @@ export function HomeInput() {
           currentInput
         );
       }
-    } catch (err) {
-      console.error("Error:", err);
-      setError(
-        err instanceof ApiError
-          ? err.message
-          : err instanceof Error
-            ? err.message
-            : "Unknown error"
-      );
+    } catch (error) {
+      setError(resolveErrorMessage(error));
       setStatus("error");
-      setTimeout(() => {
-        setStatus("idle");
-        setError(null);
-      }, ERROR_DISPLAY_DURATION);
+      scheduleReset(ERROR_DISPLAY_DURATION);
     }
   };
 
   const isLoading = status === "parsing" || status === "saving";
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-
-    const time = date.toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    });
-
-    if (date.toDateString() === today.toDateString())
-      return `today at ${time}`;
-    if (date.toDateString() === yesterday.toDateString())
-      return `yesterday at ${time}`;
-    return `${date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-    })} at ${time}`;
-  };
+  const formatDate = (dateStr: string) => formatRelativeDateLabel(dateStr);
 
   return (
     <div className="w-full space-y-3">
@@ -191,8 +159,8 @@ export function HomeInput() {
             />
             {!input && status === "idle" && (
               <p className="px-2 sm:px-3 pb-2 text-[10px] sm:text-xs text-muted-foreground">
-                <span className="hidden sm:inline">Try: "$15 lunch at chipotle" or "coffee $5 this morning"</span>
-                <span className="sm:hidden">Try: "Coffee $5" or "$15 lunch"</span>
+                <span className="hidden sm:inline">Try: &quot;$15 lunch at chipotle&quot; or &quot;coffee $5 this morning&quot;</span>
+                <span className="sm:hidden">Try: &quot;Coffee $5&quot; or &quot;$15 lunch&quot;</span>
               </p>
             )}
           </div>
@@ -291,6 +259,7 @@ export function HomeInput() {
       {/* Confirmation Dialog */}
       {parsedExpense && (
         <ExpenseConfirmationDialog
+          key={currentRawInput}
           open={showConfirmDialog}
           onOpenChange={setShowConfirmDialog}
           parsedExpense={parsedExpense}

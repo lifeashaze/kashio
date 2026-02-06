@@ -25,7 +25,7 @@ export function ProductShowcase() {
                 STEP 1
               </div>
               <h3 className="font-heading text-xl sm:text-2xl font-bold text-foreground">
-                Type like you're texting
+                Type like you&apos;re texting
               </h3>
               <p className="mt-2 text-sm sm:text-base text-muted-foreground">
                 No structure required. Write expenses however they come to mind. Kashio understands context, approximations, and natural phrasing.

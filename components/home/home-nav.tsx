@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
+import { getUserInitials } from "@/lib/user";
 
 interface HomeNavProps {
   user: {
@@ -21,14 +22,6 @@ export function HomeNav({ user }: HomeNavProps) {
   const [showMenu, setShowMenu] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
 
-  const getInitials = (name: string) => {
-    const parts = name.split(" ");
-    if (parts.length >= 2) {
-      return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
-    }
-    return name.slice(0, 2).toUpperCase();
-  };
-
   const handleSignOut = async () => {
     setIsSigningOut(true);
     try {
@@ -36,7 +29,7 @@ export function HomeNav({ user }: HomeNavProps) {
       toast.success("Signed out successfully");
       router.push("/login");
       router.refresh();
-    } catch (error) {
+    } catch {
       toast.error("Failed to sign out");
       setIsSigningOut(false);
     }
@@ -58,7 +51,7 @@ export function HomeNav({ user }: HomeNavProps) {
               aria-label="Open profile menu"
               onClick={() => setShowMenu(!showMenu)}
             >
-              {getInitials(user.name)}
+              {getUserInitials(user.name)}
             </Button>
             {showMenu && (
               <>
@@ -70,7 +63,7 @@ export function HomeNav({ user }: HomeNavProps) {
                   <div className="border-b border-border p-4">
                     <div className="flex items-center gap-3">
                       <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
-                        {getInitials(user.name)}
+                        {getUserInitials(user.name)}
                       </div>
                       <div className="flex-1 overflow-hidden">
                         <p className="truncate font-medium text-foreground">{user.name}</p>

@@ -4,6 +4,10 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api/client";
 import type { Expense } from "@/lib/schema";
 import { toast } from "sonner";
+import type {
+  CreateExpensePayload,
+  UpdateExpensePayload,
+} from "@/lib/types/expense";
 
 // Query keys
 export const expenseKeys = {
@@ -31,13 +35,7 @@ export function useCreateExpense() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (expense: {
-      amount: number;
-      description: string;
-      category: string;
-      date: string;
-      rawInput: string;
-    }) => {
+    mutationFn: async (expense: CreateExpensePayload) => {
       return await apiClient.post<Expense>("/api/expenses", expense);
     },
     onSuccess: () => {
@@ -66,6 +64,26 @@ export function useDeleteExpense() {
     onError: (error) => {
       console.error("Failed to delete expense:", error);
       toast.error("Failed to delete expense");
+    },
+  });
+}
+
+// Update expense
+export function useUpdateExpense() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (expense: UpdateExpensePayload) => {
+      const { id, ...payload } = expense;
+      return await apiClient.put<Expense>(`/api/expenses/${id}`, payload);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: expenseKeys.lists() });
+      toast.success("Expense updated");
+    },
+    onError: (error) => {
+      console.error("Failed to update expense:", error);
+      toast.error("Failed to update expense");
     },
   });
 }

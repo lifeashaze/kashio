@@ -1,246 +1,195 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Loader2 } from "lucide-react";
 import type { Expense } from "@/lib/schema";
 import {
-  CATEGORY_ICONS,
-  CATEGORY_LABELS,
-  type ExpenseCategory,
-} from "@/lib/constants/categories";
-import { Loader2, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useExpenses, useDeleteExpense } from "@/lib/hooks/use-expenses";
+  useDeleteExpense,
+  useExpenses,
+  useUpdateExpense,
+} from "@/lib/hooks/use-expenses";
+import type { UpdateExpensePayload } from "@/lib/types/expense";
+import { ExpenseEditDialog } from "@/components/home/stats/expense-edit-dialog";
+import { ExpenseRow } from "@/components/home/stats/expense-row";
+import { CONFIRM_TIMEOUT_MS } from "@/components/home/stats/helpers";
 
-const CONFIRM_TIMEOUT = 3000; // 3 seconds to confirm
+const MAX_DISPLAYED_EXPENSES = 12;
+
+function TransactionsCardHeader({ count }: { count: number }) {
+  return (
+    <div className="flex items-center justify-between border-b border-border/60 px-4 py-3">
+      <h2 className="text-sm font-semibold text-foreground">Recent Transactions</h2>
+      <span className="rounded-full border border-border/80 bg-muted/30 px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
+        {count}
+      </span>
+    </div>
+  );
+}
+
+function LoadingState() {
+  return (
+    <div className="w-full max-w-3xl mx-auto">
+      <div className="rounded-xl border border-border/70 bg-card shadow-sm">
+        <div className="flex items-center justify-between border-b border-border/60 px-4 py-3">
+          <h2 className="text-sm font-semibold text-foreground">Recent Transactions</h2>
+          <div className="h-6 w-12 rounded-full bg-muted/60" />
+        </div>
+        <div className="flex items-center justify-center py-14">
+          <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function EmptyState() {
+  return (
+    <div className="w-full max-w-3xl mx-auto">
+      <div className="rounded-xl border border-border/70 bg-card shadow-sm">
+        <TransactionsCardHeader count={0} />
+        <div className="flex flex-col items-center justify-center px-4 py-14 text-center">
+          <div className="mb-3 text-3xl opacity-45">📝</div>
+          <p className="text-sm font-medium text-foreground">No transactions yet</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Add your first expense to start tracking.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function HomeStats() {
-  const { data: expenses, isLoading: loading } = useExpenses();
+  const { data: expenses = [], isLoading } = useExpenses();
   const deleteExpense = useDeleteExpense();
+  const updateExpense = useUpdateExpense();
+
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
 
-  const displayedExpenses = expenses?.slice(0, 10) || [];
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Auto-cancel delete confirmation after timeout
+  const displayedExpenses = expenses.slice(0, MAX_DISPLAYED_EXPENSES);
+
   useEffect(() => {
-    if (pendingDeleteId) {
-      timeoutRef.current = setTimeout(() => {
-        setPendingDeleteId(null);
-      }, CONFIRM_TIMEOUT);
+    if (!pendingDeleteId) return;
 
-      return () => {
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current);
-        }
-      };
-    }
+    timeoutRef.current = setTimeout(() => {
+      setPendingDeleteId(null);
+    }, CONFIRM_TIMEOUT_MS);
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
   }, [pendingDeleteId]);
-
-  const formatCurrency = (amount: string) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-    }).format(parseFloat(amount));
-  };
-
-  const formatDate = (date: Date) => {
-    const expenseDate = new Date(date);
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-
-    const isToday = expenseDate.toDateString() === today.toDateString();
-    const isYesterday = expenseDate.toDateString() === yesterday.toDateString();
-
-    if (isToday) {
-      return `Today, ${expenseDate.toLocaleTimeString("en-US", {
-        hour: "numeric",
-        minute: "2-digit",
-      })}`;
-    } else if (isYesterday) {
-      return `Yesterday, ${expenseDate.toLocaleTimeString("en-US", {
-        hour: "numeric",
-        minute: "2-digit",
-      })}`;
-    } else {
-      return expenseDate.toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        hour: "numeric",
-        minute: "2-digit",
-      });
-    }
-  };
 
   const handleDelete = async (expenseId: string) => {
     if (pendingDeleteId === expenseId) {
-      // Second click - actually delete
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
-      await deleteExpense.mutateAsync(expenseId);
-      setPendingDeleteId(null);
-    } else {
-      // First click - show confirmation
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
+
+      try {
+        await deleteExpense.mutateAsync(expenseId);
+      } finally {
+        setPendingDeleteId(null);
       }
-      setPendingDeleteId(expenseId);
+      return;
+    }
+
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    setPendingDeleteId(expenseId);
+  };
+
+  const handleSaveEdit = async (payload: UpdateExpensePayload) => {
+    try {
+      await updateExpense.mutateAsync(payload);
+      setEditingExpense(null);
+    } catch {
+      // Mutation hook displays toast feedback.
     }
   };
 
-  if (loading) {
-    return (
-      <div className="w-full max-w-3xl mx-auto">
-        <div className="rounded-md border border-border/60 bg-card">
-          <div className="border-b border-border/60 px-3 py-1.5">
-            <h2 className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Recent Transactions</h2>
-          </div>
-          <div className="flex items-center justify-center py-8">
-            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-          </div>
-        </div>
-      </div>
-    );
+  if (isLoading) {
+    return <LoadingState />;
   }
 
   if (displayedExpenses.length === 0) {
-    return (
-      <div className="w-full max-w-3xl mx-auto">
-        <div className="rounded-md border border-border/60 bg-card">
-          <div className="border-b border-border/60 px-3 py-1.5">
-            <h2 className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Recent Transactions</h2>
-          </div>
-          <div className="flex flex-col items-center justify-center py-12 text-center px-4">
-            <div className="text-3xl mb-2 opacity-40">📝</div>
-            <p className="text-xs text-muted-foreground">
-              No transactions yet
-            </p>
-          </div>
-        </div>
-      </div>
-    );
+    return <EmptyState />;
   }
 
   return (
     <div className="w-full max-w-3xl mx-auto">
-      <div className="rounded-md border border-border/60 bg-card overflow-hidden">
-        {/* Header */}
-        <div className="border-b border-border/60 px-3 py-1.5">
-          <h2 className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Recent Transactions</h2>
-        </div>
+      <div className="overflow-hidden rounded-xl border border-border/70 bg-card shadow-sm">
+        <TransactionsCardHeader count={displayedExpenses.length} />
 
-        {/* Column Headers */}
-        <div className="border-b border-border/40 bg-muted/30 px-3 py-1">
-          <div className="flex items-center gap-3 text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
-            <div className="w-4 flex-shrink-0"></div>
-            <div className="flex-1 min-w-0">Description</div>
-            <div className="w-24 flex-shrink-0 hidden lg:block">Category</div>
-            <div className="w-24 flex-shrink-0 text-right">Amount</div>
-            <div className="w-20 flex-shrink-0"></div>
+        <div className="hidden border-b border-border/50 bg-muted/30 px-4 py-2 md:block">
+          <div className="grid grid-cols-[minmax(0,1.8fr)_130px_160px_110px_130px] items-center gap-3 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+            <span>Description</span>
+            <span>Category</span>
+            <span>Date</span>
+            <span className="text-right">Amount</span>
+            <span className="text-right">Actions</span>
           </div>
         </div>
 
-        {/* Transactions Table */}
-        <div className="divide-y divide-border/60">
+        <div className="hidden divide-y divide-border/60 md:block">
           {displayedExpenses.map((expense) => {
             const isPendingDelete = pendingDeleteId === expense.id;
 
             return (
-              <div
+              <ExpenseRow
                 key={expense.id}
-                className="flex items-center gap-3 px-3 py-1.5 hover:bg-muted/50 transition-colors group"
-              >
-                {/* Icon */}
-                <div className="w-4 text-sm flex-shrink-0 text-center leading-none">
-                  {CATEGORY_ICONS[expense.category as ExpenseCategory]}
-                </div>
+                expense={expense}
+                layout="desktop"
+                isPendingDelete={isPendingDelete}
+                isDeletingCurrent={deleteExpense.isPending && isPendingDelete}
+                disableEdit={deleteExpense.isPending || updateExpense.isPending}
+                disableDelete={updateExpense.isPending}
+                onEdit={() => setEditingExpense(expense)}
+                onDelete={() => handleDelete(expense.id)}
+              />
+            );
+          })}
+        </div>
 
-                {/* Description + Meta */}
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium truncate leading-tight">
-                    {expense.description}
-                  </p>
-                  <p className="text-[10px] text-muted-foreground leading-tight mt-0.5">
-                    {CATEGORY_LABELS[expense.category as ExpenseCategory]} · {formatDate(expense.date)}
-                  </p>
-                </div>
+        <div className="divide-y divide-border/60 md:hidden">
+          {displayedExpenses.map((expense) => {
+            const isPendingDelete = pendingDeleteId === expense.id;
 
-                {/* Category (desktop only) */}
-                <div className="w-24 flex-shrink-0 hidden lg:block">
-                  <span className="text-[11px] text-muted-foreground">
-                    {CATEGORY_LABELS[expense.category as ExpenseCategory]}
-                  </span>
-                </div>
-
-                {/* Amount */}
-                <div className="w-24 flex-shrink-0 text-right">
-                  <span className="text-xs font-semibold tabular-nums">
-                    {formatCurrency(expense.amount)}
-                  </span>
-                </div>
-
-                {/* Delete Button */}
-                <div className="w-20 flex-shrink-0 flex justify-end items-center">
-                  {isPendingDelete ? (
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      className="h-6 text-[10px] px-2 flex items-center gap-1.5"
-                      onClick={() => handleDelete(expense.id)}
-                      disabled={deleteExpense.isPending}
-                    >
-                      {deleteExpense.isPending ? (
-                        <Loader2 className="h-3 w-3 animate-spin" />
-                      ) : (
-                        <>
-                          <span>Confirm?</span>
-                          {/* Circular countdown timer */}
-                          <svg
-                            key={expense.id}
-                            className="w-3.5 h-3.5 -rotate-90 flex-shrink-0"
-                            viewBox="0 0 20 20"
-                          >
-                            <circle
-                              cx="10"
-                              cy="10"
-                              r="8"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="3"
-                              className="opacity-30"
-                            />
-                            <circle
-                              cx="10"
-                              cy="10"
-                              r="8"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="3"
-                              strokeDasharray="50.265"
-                              className="countdown-timer"
-                            />
-                          </svg>
-                        </>
-                      )}
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
-                      onClick={() => handleDelete(expense.id)}
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
-                  )}
-                </div>
-              </div>
+            return (
+              <ExpenseRow
+                key={expense.id}
+                expense={expense}
+                layout="mobile"
+                isPendingDelete={isPendingDelete}
+                isDeletingCurrent={deleteExpense.isPending && isPendingDelete}
+                disableEdit={deleteExpense.isPending || updateExpense.isPending}
+                disableDelete={updateExpense.isPending}
+                onEdit={() => setEditingExpense(expense)}
+                onDelete={() => handleDelete(expense.id)}
+              />
             );
           })}
         </div>
       </div>
+
+      <ExpenseEditDialog
+        key={editingExpense?.id ?? "no-expense-selected"}
+        expense={editingExpense}
+        isSaving={updateExpense.isPending}
+        onClose={() => {
+          if (!updateExpense.isPending) {
+            setEditingExpense(null);
+          }
+        }}
+        onSave={handleSaveEdit}
+      />
     </div>
   );
 }

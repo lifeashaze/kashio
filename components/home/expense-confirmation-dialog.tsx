@@ -20,13 +20,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { DateTimePicker } from "@/components/ui/date-time-picker";
+import { DatePicker } from "@/components/ui/date-picker";
 import { AlertCircle } from "lucide-react";
 import {
   EXPENSE_CATEGORIES,
   CATEGORY_LABELS,
   type ExpenseCategory,
 } from "@/lib/constants/categories";
+import { dateOnlyStringToDate, dateToDateOnlyString } from "@/lib/date";
 import type { ParsedExpense, ValidatedExpense } from "@/lib/types/expense";
 import { getConfirmationMessage } from "@/lib/prompts/expense-parser";
 
@@ -54,7 +55,9 @@ export function ExpenseConfirmationDialog({
   const [category, setCategory] = useState<ExpenseCategory>(
     parsedExpense.category
   );
-  const [date, setDate] = useState(new Date(parsedExpense.date));
+  const [date, setDate] = useState(
+    dateOnlyStringToDate(parsedExpense.date) ?? new Date()
+  );
 
   const handleConfirm = () => {
     const numAmount = parseFloat(amount);
@@ -63,7 +66,7 @@ export function ExpenseConfirmationDialog({
         amount: numAmount,
         description: description.trim(),
         category,
-        date: date.toISOString(),
+        date: dateToDateOnlyString(date),
       });
     }
   };
@@ -166,8 +169,8 @@ export function ExpenseConfirmationDialog({
 
           {/* Date */}
           <div className="space-y-1">
-            <Label className="text-xs">Date & Time</Label>
-            <DateTimePicker
+            <Label className="text-xs">Date</Label>
+            <DatePicker
               date={date}
               setDate={setDate}
               className="w-full"

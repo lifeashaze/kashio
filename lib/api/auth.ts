@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import { unauthorized } from "@/lib/api/responses";
 
 export type AuthSession = {
   session: {
@@ -34,7 +35,7 @@ export async function requireAuth(): Promise<SessionResult> {
   if (!session) {
     return {
       success: false,
-      response: Response.json({ error: "Unauthorized" }, { status: 401 }),
+      response: unauthorized(),
     };
   }
 

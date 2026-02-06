@@ -25,7 +25,7 @@ export function Hero() {
           </h1>
 
           <p className="mx-auto mt-4 sm:mt-6 max-w-2xl text-base sm:text-lg md:text-xl leading-relaxed text-muted-foreground px-2">
-            Kashio understands natural language. Type expenses like you're texting (messy, casual, human). We'll handle the parsing, categorization, and organization.
+            Kashio understands natural language. Type expenses like you&apos;re texting (messy, casual, human). We&apos;ll handle the parsing, categorization, and organization.
           </p>
 
           {/* CTA Buttons */}

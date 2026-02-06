@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Send, Check, Loader2 } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Check, Loader2 } from "lucide-react";
 
 const examples = [
   {

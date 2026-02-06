@@ -1,41 +1,103 @@
 import { db } from "@/lib/db";
 import { expenses } from "@/lib/schema";
-import { requireAuth } from "@/lib/api/auth";
-import { success, serverError, notFound, forbidden } from "@/lib/api/responses";
+import {
+  success,
+  notFound,
+  noContent,
+} from "@/lib/api/responses";
 import { eq, and } from "drizzle-orm";
+import {
+  parseRequestBody,
+  parseRouteParam,
+  requireRouteAuth,
+  withServerErrorBoundary,
+} from "@/lib/api/route-helpers";
+import {
+  expenseIdSchema,
+  updateExpenseSchema,
+} from "@/lib/expenses/schemas";
 
-export async function DELETE(
+type RouteParams = {
+  params: Promise<{ id: string }>;
+};
+
+async function findOwnedExpense(id: string, userId: string) {
+  const [expense] = await db
+    .select()
+    .from(expenses)
+    .where(and(eq(expenses.id, id), eq(expenses.userId, userId)))
+    .limit(1);
+
+  return expense;
+}
+
+export async function PUT(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: RouteParams
 ) {
-  try {
-    const authResult = await requireAuth();
-    if (!authResult.success) return authResult.response;
-    const { session } = authResult;
+  return withServerErrorBoundary("update expense", async () => {
+    const auth = await requireRouteAuth();
+    if (!auth.ok) return auth.response;
 
-    const { id } = await params;
+    const resolvedParams = await params;
+    const parsedId = parseRouteParam(resolvedParams.id, expenseIdSchema);
+    if (!parsedId.ok) return parsedId.response;
 
-    // Verify expense exists and belongs to user
-    const existing = await db
-      .select()
-      .from(expenses)
-      .where(eq(expenses.id, id))
-      .limit(1);
+    const body = await parseRequestBody(req, updateExpenseSchema);
+    if (!body.ok) return body.response;
 
-    if (existing.length === 0) {
+    const existingExpense = await findOwnedExpense(parsedId.data, auth.data.user.id);
+    if (!existingExpense) {
       return notFound("Expense not found");
     }
 
-    if (existing[0].userId !== session.user.id) {
-      return forbidden("You don't have permission to delete this expense");
+    const updated = await db
+      .update(expenses)
+      .set({
+        amount: body.data.amount.toFixed(2),
+        description: body.data.description,
+        category: body.data.category,
+        date: body.data.date,
+      })
+      .where(
+        and(
+          eq(expenses.id, parsedId.data),
+          eq(expenses.userId, auth.data.user.id)
+        )
+      )
+      .returning();
+
+    return success(updated[0]);
+  });
+}
+
+export async function DELETE(
+  req: Request,
+  { params }: RouteParams
+) {
+  void req;
+  return withServerErrorBoundary("delete expense", async () => {
+    const auth = await requireRouteAuth();
+    if (!auth.ok) return auth.response;
+
+    const resolvedParams = await params;
+    const parsedId = parseRouteParam(resolvedParams.id, expenseIdSchema);
+    if (!parsedId.ok) return parsedId.response;
+
+    const existingExpense = await findOwnedExpense(parsedId.data, auth.data.user.id);
+    if (!existingExpense) {
+      return notFound("Expense not found");
     }
 
     await db
       .delete(expenses)
-      .where(and(eq(expenses.id, id), eq(expenses.userId, session.user.id)));
+      .where(
+        and(
+          eq(expenses.id, parsedId.data),
+          eq(expenses.userId, auth.data.user.id)
+        )
+      );
 
-    return success({ message: "Expense deleted successfully" });
-  } catch (error) {
-    return serverError("Failed to delete expense", error);
-  }
+    return noContent();
+  });
 }

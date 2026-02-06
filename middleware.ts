@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const protectedRoutes = ["/home"];
+const protectedRoutePrefixes = ["/home", "/profile"];
 const authRoutes = ["/login", "/signup"];
+
+function isProtectedRoute(pathname: string) {
+  return protectedRoutePrefixes.some((prefix) => pathname.startsWith(prefix));
+}
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -16,7 +20,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/home", request.url));
   }
 
-  if (protectedRoutes.some(route => pathname.startsWith(route)) && !hasSession) {
+  if (isProtectedRoute(pathname) && !hasSession) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 

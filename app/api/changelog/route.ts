@@ -1,41 +1,48 @@
 import { db } from "@/lib/db";
 import { changelog } from "@/lib/schema";
 import { desc } from "drizzle-orm";
-import { badRequest, created, success, serverError } from "@/lib/api/responses";
+import { z } from "zod";
+import { created, success } from "@/lib/api/responses";
+import {
+  parseRequestBody,
+  withServerErrorBoundary,
+} from "@/lib/api/route-helpers";
+
+const changelogRequestSchema = z.object({
+  content: z.string().trim().min(1, "Content is required"),
+  date: z
+    .string()
+    .trim()
+    .refine((value) => !Number.isNaN(new Date(value).getTime()), {
+      message: "Invalid date value",
+    })
+    .optional(),
+});
 
 export async function GET() {
-  try {
+  return withServerErrorBoundary("fetch changelog", async () => {
     const entries = await db
       .select()
       .from(changelog)
       .orderBy(desc(changelog.date));
 
     return success(entries);
-  } catch (error) {
-    return serverError("Failed to fetch changelog", error);
-  }
+  });
 }
 
 export async function POST(request: Request) {
-  try {
-    const body = await request.json();
-    const { date, content } = body;
-
-    if (!content) {
-      return badRequest("Content is required");
-    }
+  return withServerErrorBoundary("create changelog entry", async () => {
+    const body = await parseRequestBody(request, changelogRequestSchema);
+    if (!body.ok) return body.response;
 
     const [entry] = await db
       .insert(changelog)
       .values({
-        date: date ? new Date(date) : new Date(),
-        content,
+        date: body.data.date ? new Date(body.data.date) : new Date(),
+        content: body.data.content,
       })
       .returning();
 
     return created(entry);
-  } catch (error) {
-    return serverError("Failed to create changelog entry", error);
-  }
+  });
 }
-

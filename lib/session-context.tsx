@@ -26,7 +26,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
           setSession(data);
           setIsLoading(false);
         }
-      } catch (error) {
+      } catch {
         if (mounted) {
           setSession(null);
           setIsLoading(false);
