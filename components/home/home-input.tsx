@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Send, Check, AlertCircle } from "lucide-react";
+import { useRef, useState } from "react";
+import { Send, Check, AlertCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ExpenseConfirmationDialog } from "./expense-confirmation-dialog";
 import { CATEGORY_ICONS } from "@/lib/constants/categories";
@@ -15,9 +15,16 @@ import type { ParsedExpense, ValidatedExpense } from "@/lib/types/expense";
 import { apiClient, ApiError } from "@/lib/api/client";
 import { useCreateExpense } from "@/lib/hooks/use-expenses";
 
+const QUICK_EXAMPLES = [
+  "$12 breakfast sandwich",
+  "Uber $24 downtown",
+  "Groceries 86.40 yesterday",
+];
+
 export function HomeInput() {
   const createExpense = useCreateExpense();
   const [input, setInput] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<
     "idle" | "parsing" | "saving" | "saved" | "error"
   >("idle");
@@ -99,7 +106,7 @@ export function HomeInput() {
       // Case 1: Not an expense at all
       if (!parsed.isValidExpense) {
         showValidationError(
-          `${parsed.reasoning} Try something like: "$15 lunch at chipotle" or "coffee $5 this morning"`
+          `${parsed.reasoning} Try something like: "$15 lunch" or "coffee $5 this morning"`
         );
         return;
       }
@@ -147,39 +154,75 @@ export function HomeInput() {
   return (
     <div className="w-full space-y-3">
       <form onSubmit={handleSubmit} className="w-full">
-        <div className="flex items-end gap-2 rounded-xl sm:rounded-2xl border border-border/60 bg-card p-2 shadow-sm">
+        <div className="flex items-end gap-2">
           <div className="flex-1 min-w-0">
-            <input
-              value={input}
-              onChange={(event) => setInput(event.target.value)}
-              placeholder="Type an expense... e.g. 'Coffee $5'"
-              className="w-full resize-none bg-transparent px-2 sm:px-3 py-2 text-base text-foreground placeholder:text-muted-foreground focus:outline-none"
-              autoFocus
-              disabled={isLoading}
-            />
-            {!input && status === "idle" && (
-              <p className="px-2 sm:px-3 pb-2 text-[10px] sm:text-xs text-muted-foreground">
-                <span className="hidden sm:inline">Try: &quot;$15 lunch at chipotle&quot; or &quot;coffee $5 this morning&quot;</span>
-                <span className="sm:hidden">Try: &quot;Coffee $5&quot; or &quot;$15 lunch&quot;</span>
-              </p>
-            )}
+            <label htmlFor="expense-input" className="sr-only">
+              Enter expense
+            </label>
+              <input
+                id="expense-input"
+                ref={inputRef}
+                value={input}
+                onChange={(event) => setInput(event.target.value)}
+                placeholder="Type what you spent... e.g. coffee $5 this morning"
+                className="h-11 w-full rounded-xl border border-border/70 bg-muted/20 px-3.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary/40 focus:bg-background/80 focus:outline-none sm:text-base"
+                autoFocus
+                disabled={isLoading}
+              />
           </div>
           <Button
             type="submit"
-            size="sm"
+            size="lg"
             disabled={!input.trim() || isLoading}
-            className="h-8 sm:h-9 shrink-0 rounded-lg sm:rounded-xl px-3 sm:px-4"
+            className="h-11 shrink-0 rounded-xl px-3 sm:px-4"
           >
             {status === "saved" ? (
-              <Check className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <>
+                <Check className="h-4 w-4" />
+                <span className="hidden sm:inline">Saved</span>
+              </>
             ) : status === "error" ? (
-              <AlertCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <>
+                <AlertCircle className="h-4 w-4" />
+                <span className="hidden sm:inline">Retry</span>
+              </>
+            ) : isLoading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span className="hidden sm:inline">
+                  {status === "parsing" ? "Parsing" : "Saving"}
+                </span>
+              </>
             ) : (
-              <Send className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <>
+                <Send className="h-4 w-4" />
+                <span className="hidden sm:inline">Add</span>
+              </>
             )}
           </Button>
         </div>
       </form>
+
+      <div className="grid w-full grid-cols-2 gap-2.5 sm:grid-cols-3">
+        {QUICK_EXAMPLES.map((example, index) => (
+          <button
+            key={example}
+            type="button"
+            onClick={() => {
+              setInput(example);
+              inputRef.current?.focus();
+            }}
+            disabled={isLoading}
+            className={`h-11 w-full cursor-pointer rounded-xl bg-card px-3 text-center text-sm font-medium text-foreground shadow-sm ring-1 ring-border/60 transition-colors hover:bg-muted/70 hover:ring-primary/30 disabled:pointer-events-none disabled:opacity-50 ${
+              index === 2
+                ? "col-span-2 w-[calc(50%-0.3125rem)] justify-self-center sm:col-span-1 sm:w-full"
+                : ""
+            }`}
+          >
+            {example}
+          </button>
+        ))}
+      </div>
 
       {/* Status Feedback */}
       {status === "parsing" && (

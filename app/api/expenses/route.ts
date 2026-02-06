@@ -42,7 +42,7 @@ export async function GET() {
       .select()
       .from(expenses)
       .where(eq(expenses.userId, auth.data.user.id))
-      .orderBy(desc(expenses.date));
+      .orderBy(desc(expenses.createdAt));
 
     return success(userExpenses);
   });

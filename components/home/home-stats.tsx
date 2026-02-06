@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, ReceiptText } from "lucide-react";
 import type { Expense } from "@/lib/schema";
 import {
   useDeleteExpense,
@@ -48,7 +48,9 @@ function EmptyState() {
       <div className="rounded-xl border border-border/70 bg-card shadow-sm">
         <TransactionsCardHeader count={0} />
         <div className="flex flex-col items-center justify-center px-4 py-14 text-center">
-          <div className="mb-3 text-3xl opacity-45">📝</div>
+          <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full border border-border/70 bg-muted/40 text-muted-foreground">
+            <ReceiptText className="h-4 w-4" />
+          </div>
           <p className="text-sm font-medium text-foreground">No transactions yet</p>
           <p className="mt-1 text-xs text-muted-foreground">
             Add your first expense to start tracking.
@@ -129,7 +131,7 @@ export function HomeStats() {
         <TransactionsCardHeader count={displayedExpenses.length} />
 
         <div className="hidden border-b border-border/50 bg-muted/30 px-4 py-2 md:block">
-          <div className="grid grid-cols-[minmax(0,1.8fr)_130px_160px_110px_130px] items-center gap-3 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+          <div className="grid grid-cols-[minmax(0,1.9fr)_140px_120px_120px_92px] items-center gap-3 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
             <span>Description</span>
             <span>Category</span>
             <span>Date</span>

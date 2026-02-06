@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2, Pencil, Trash2 } from "lucide-react";
+import { Check, Loader2, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type ExpenseRowActionsProps = {
@@ -21,42 +21,46 @@ export function ExpenseRowActions({
   onDelete,
 }: ExpenseRowActionsProps) {
   return (
-    <div className="flex items-center justify-end gap-1.5">
+    <div className="flex items-center justify-end gap-2">
       <Button
-        variant="ghost"
-        size="xs"
-        className="h-7 px-2 text-xs"
+        variant="outline"
+        size="icon-sm"
+        className="h-8 w-8 border-border/70 text-muted-foreground hover:text-foreground"
         onClick={onEdit}
         disabled={disableEdit}
+        aria-label="Edit transaction"
+        title="Edit transaction"
       >
-        <Pencil className="h-3 w-3" />
-        Edit
+        <Pencil className="h-3.5 w-3.5" />
       </Button>
 
       {isPendingDelete ? (
         <Button
           variant="destructive"
-          size="xs"
-          className="h-7 px-2 text-xs"
+          size="icon-sm"
+          className="h-8 w-8 border border-destructive/40"
           onClick={onDelete}
           disabled={isDeletingCurrent}
+          aria-label="Confirm delete"
+          title="Confirm delete"
         >
           {isDeletingCurrent ? (
             <Loader2 className="h-3.5 w-3.5 animate-spin" />
           ) : (
-            "Confirm"
+            <Check className="h-3.5 w-3.5" />
           )}
         </Button>
       ) : (
         <Button
-          variant="ghost"
-          size="xs"
-          className="h-7 px-2 text-xs text-muted-foreground hover:text-destructive"
+          variant="outline"
+          size="icon-sm"
+          className="h-8 w-8 border-border/70 text-muted-foreground hover:border-destructive/40 hover:text-destructive"
           onClick={onDelete}
           disabled={disableDelete}
+          aria-label="Delete transaction"
+          title="Delete transaction"
         >
-          <Trash2 className="h-3 w-3" />
-          Delete
+          <Trash2 className="h-3.5 w-3.5" />
         </Button>
       )}
     </div>

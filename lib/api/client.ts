@@ -14,6 +14,37 @@ interface RequestOptions extends RequestInit {
   params?: Record<string, string>;
 }
 
+function isObjectWithErrorMessage(
+  value: unknown
+): value is { error: string } {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "error" in value &&
+    typeof value.error === "string"
+  );
+}
+
+async function parseResponseBody(response: Response): Promise<unknown> {
+  const contentLength = response.headers.get("content-length");
+  if (
+    response.status === 204 ||
+    response.status === 205 ||
+    contentLength === "0"
+  ) {
+    return undefined;
+  }
+
+  const text = await response.text();
+  if (!text) return undefined;
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return text;
+  }
+}
+
 async function request<T>(
   endpoint: string,
   options: RequestOptions = {}
@@ -36,15 +67,18 @@ async function request<T>(
   });
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
+    const error = await parseResponseBody(response);
     throw new ApiError(
-      error.error || `Request failed with status ${response.status}`,
+      isObjectWithErrorMessage(error)
+        ? error.error
+        : `Request failed with status ${response.status}`,
       response.status,
       error
     );
   }
 
-  return response.json();
+  const data = await parseResponseBody(response);
+  return data as T;
 }
 
 export const apiClient = {
