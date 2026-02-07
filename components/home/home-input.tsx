@@ -164,8 +164,8 @@ export function HomeInput() {
                 ref={inputRef}
                 value={input}
                 onChange={(event) => setInput(event.target.value)}
-                placeholder="Type what you spent... e.g. coffee $5 this morning"
-                className="h-11 w-full rounded-xl border border-border/70 bg-muted/20 px-3.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary/40 focus:bg-background/80 focus:outline-none sm:text-base"
+                placeholder="Add expense..."
+                className="h-11 w-full rounded-xl border border-border/70 bg-muted/20 px-3.5 text-base text-foreground placeholder:text-muted-foreground focus:border-primary/40 focus:bg-background/80 focus:outline-none"
                 autoFocus
                 disabled={isLoading}
               />
