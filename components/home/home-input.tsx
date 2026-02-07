@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Send, Check, AlertCircle, Loader2 } from "lucide-react";
+import { Plus, Check, AlertCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ExpenseConfirmationDialog } from "./expense-confirmation-dialog";
 import { CATEGORY_ICONS } from "@/lib/constants/categories";
@@ -195,7 +195,7 @@ export function HomeInput() {
               </>
             ) : (
               <>
-                <Send className="h-4 w-4" />
+                <Plus className="h-4 w-4" />
                 <span className="hidden sm:inline">Add</span>
               </>
             )}

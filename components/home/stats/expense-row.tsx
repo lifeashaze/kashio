@@ -21,6 +21,7 @@ import {
 import { cn } from "@/lib/utils";
 import { ExpenseRowActions } from "@/components/home/stats/expense-row-actions";
 import {
+  EXPENSE_TABLE_GRID_COLUMNS,
   formatExpenseCurrency,
   formatExpenseDate,
 } from "@/components/home/stats/helpers";
@@ -140,14 +141,15 @@ export function ExpenseRow({
     return (
       <div
         className={cn(
-          "grid grid-cols-[minmax(0,1.9fr)_140px_120px_120px_92px] items-center gap-3 px-4 py-3 transition-colors",
+          "grid items-center gap-4 px-4 py-3.5 transition-colors",
+          EXPENSE_TABLE_GRID_COLUMNS,
           isPendingDelete ? "bg-destructive/8" : "hover:bg-muted/30"
         )}
       >
-        <div className="flex min-w-0 items-start gap-3">
+        <div className="flex min-w-0 items-center gap-3.5">
           <div
             className={cn(
-              "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border",
+              "flex h-9 w-9 shrink-0 items-center justify-center rounded-full border",
               iconClassName
             )}
           >
@@ -156,7 +158,7 @@ export function ExpenseRow({
 
           <div className="min-w-0">
             <p
-              className="truncate text-sm font-medium text-foreground"
+              className="truncate text-sm font-medium leading-5 text-foreground"
               title={expense.rawInput}
             >
               {expense.description}
@@ -167,7 +169,7 @@ export function ExpenseRow({
         <div className="min-w-0">
           <span
             className={cn(
-              "inline-flex max-w-full rounded-full border px-2 py-0.5 text-xs font-medium",
+              "inline-flex h-7 max-w-full items-center rounded-full border px-2.5 text-xs font-semibold tracking-[0.01em]",
               badgeClassName
             )}
           >
@@ -175,12 +177,12 @@ export function ExpenseRow({
           </span>
         </div>
 
-        <div className="text-xs font-medium text-muted-foreground">
+        <div className="text-sm text-muted-foreground">
           {formatExpenseDate(expense.date)}
         </div>
 
-        <div className="text-right">
-          <span className="text-sm font-semibold tabular-nums text-foreground">
+        <div className="justify-self-end">
+          <span className="inline-flex min-w-[6.75rem] justify-end text-base font-semibold tabular-nums text-foreground">
             {formatExpenseCurrency(expense.amount)}
           </span>
         </div>
@@ -200,12 +202,17 @@ export function ExpenseRow({
   }
 
   return (
-    <div className={cn("space-y-2.5 px-4 py-3", isPendingDelete && "bg-destructive/8")}>
+    <div
+      className={cn(
+        "space-y-3 px-4 py-3.5",
+        isPendingDelete && "bg-destructive/8"
+      )}
+    >
       <div className="flex items-start justify-between gap-3">
-        <div className="flex min-w-0 items-start gap-2.5">
+        <div className="flex min-w-0 items-center gap-3">
           <div
             className={cn(
-              "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border",
+              "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border",
               iconClassName
             )}
           >
@@ -213,27 +220,30 @@ export function ExpenseRow({
           </div>
 
           <div className="min-w-0">
-            <p className="truncate text-sm font-medium text-foreground" title={expense.rawInput}>
+            <p
+              className="truncate text-sm font-medium leading-5 text-foreground"
+              title={expense.rawInput}
+            >
               {expense.description}
             </p>
           </div>
         </div>
-        <span className="shrink-0 text-sm font-semibold tabular-nums text-foreground">
+        <span className="shrink-0 text-base font-semibold tabular-nums text-foreground">
           {formatExpenseCurrency(expense.amount)}
         </span>
       </div>
 
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-2">
           <span
             className={cn(
-              "inline-flex rounded-full border px-2 py-0.5 text-xs font-medium",
+              "inline-flex h-6 items-center rounded-full border px-2 text-xs font-semibold tracking-[0.01em]",
               badgeClassName
             )}
           >
             {CATEGORY_LABELS[category]}
           </span>
-          <span className="truncate text-xs font-medium text-muted-foreground">
+          <span className="truncate text-xs text-muted-foreground">
             {formatExpenseDate(expense.date)}
           </span>
         </div>

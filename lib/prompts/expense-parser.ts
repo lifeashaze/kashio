@@ -28,11 +28,20 @@ VALIDATION RULES:
    - Set amount=null if not found in input
    - Set description=null if what was purchased is unclear
 
+5. Description grammar and casing (for DB-ready text):
+   - Return description in English title case
+   - Capitalize major words
+   - Keep minor connector words lowercase unless they are first or last:
+     a, an, and, as, at, but, by, for, from, in, nor, of, on, or, per, the, to, via, vs, with
+   - Fix random/mixed casing from user input (e.g., "pRiCeRiTe mARketPlace" -> "Pricerite Marketplace")
+   - Do not add trailing punctuation
+
 EXAMPLES:
 - "hello" → isValidExpense=false, reasoning="This is a greeting, not an expense"
 - "spent money" → isValidExpense=true, confidence="low", amount=null, description=null, missingFields=["amount","description"]
 - "$50" → isValidExpense=true, confidence="low", amount=50, description=null, missingFields=["description"]
-- "$15 chipotle" → isValidExpense=true, confidence="high", amount=15, description="chipotle", missingFields=[]
+- "$15 chipotle" → isValidExpense=true, confidence="high", amount=15, description="Chipotle", missingFields=[]
+- "$29 pricerite marketplace" → isValidExpense=true, confidence="high", amount=29, description="Pricerite Marketplace", missingFields=[]
 
 DATE HANDLING (YYYY-MM-DD format only):
 - Always return date only (no time)

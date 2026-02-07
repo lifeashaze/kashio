@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { EXPENSE_CATEGORIES } from "@/lib/constants/categories";
 import { normalizeDateInput } from "@/lib/date";
+import { normalizeExpenseDescription } from "@/lib/expenses/text";
 
 const amountSchema = z.coerce
   .number({
@@ -31,7 +32,8 @@ export const createExpenseSchema = z.object({
   description: z
     .string({ error: "Description is required" })
     .trim()
-    .min(1, "Description is required"),
+    .min(1, "Description is required")
+    .transform((value) => normalizeExpenseDescription(value)),
   category: z.enum(EXPENSE_CATEGORIES, {
     error: "Invalid category",
   }),
@@ -77,7 +79,9 @@ export const parsedExpenseSchema = z.object({
   description: z
     .string()
     .nullable()
-    .describe("A brief description of the expense, null if unclear"),
+    .describe(
+      "A brief description of the expense in normalized English title case, or null if unclear"
+    ),
   category: z
     .enum(EXPENSE_CATEGORIES)
     .describe("The category that best fits this expense"),

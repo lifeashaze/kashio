@@ -7,6 +7,7 @@ import {
 } from "@/lib/api/route-helpers";
 import { getExpenseParserPrompt } from "@/lib/prompts/expense-parser";
 import { dateToDateOnlyString, normalizeDateInput } from "@/lib/date";
+import { normalizeExpenseDescription } from "@/lib/expenses/text";
 import {
   parsedExpenseSchema,
   parseExpenseRequestSchema,
@@ -36,9 +37,13 @@ export async function POST(req: Request) {
     });
 
     const normalizedDate = normalizeDateInput(result.object.date) ?? currentDate;
+    const normalizedDescription = result.object.description
+      ? normalizeExpenseDescription(result.object.description)
+      : null;
 
     return success({
       ...result.object,
+      description: normalizedDescription,
       date: normalizedDate,
     });
   });

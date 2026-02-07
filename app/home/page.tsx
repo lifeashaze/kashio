@@ -9,7 +9,6 @@ export default async function HomePage() {
   });
 
   if (!session) {
-    // Clear invalid session cookie before redirecting
     redirect("/api/clear-session");
   }
 

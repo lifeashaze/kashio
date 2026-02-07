@@ -11,9 +11,14 @@ import {
 import type { UpdateExpensePayload } from "@/lib/types/expense";
 import { ExpenseEditDialog } from "@/components/home/stats/expense-edit-dialog";
 import { ExpenseRow } from "@/components/home/stats/expense-row";
-import { CONFIRM_TIMEOUT_MS } from "@/components/home/stats/helpers";
+import { Button } from "@/components/ui/button";
+import {
+  CONFIRM_TIMEOUT_MS,
+  EXPENSE_TABLE_GRID_COLUMNS,
+} from "@/components/home/stats/helpers";
 
-const MAX_DISPLAYED_EXPENSES = 12;
+const INITIAL_DISPLAYED_EXPENSES = 5;
+const LOAD_MORE_STEP = 5;
 
 function TransactionsCardHeader({ count }: { count: number }) {
   return (
@@ -68,10 +73,13 @@ export function HomeStats() {
 
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
+  const [visibleCount, setVisibleCount] = useState(INITIAL_DISPLAYED_EXPENSES);
 
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const displayedExpenses = expenses.slice(0, MAX_DISPLAYED_EXPENSES);
+  const displayedExpenses = expenses.slice(0, visibleCount);
+  const hasMoreExpenses = expenses.length > displayedExpenses.length;
+  const remainingExpenses = expenses.length - displayedExpenses.length;
 
   useEffect(() => {
     if (!pendingDeleteId) return;
@@ -128,15 +136,17 @@ export function HomeStats() {
   return (
     <div className="w-full max-w-3xl mx-auto">
       <div className="overflow-hidden rounded-xl border border-border/70 bg-card shadow-sm">
-        <TransactionsCardHeader count={displayedExpenses.length} />
+        <TransactionsCardHeader count={expenses.length} />
 
         <div className="hidden border-b border-border/50 bg-muted/30 px-4 py-2 md:block">
-          <div className="grid grid-cols-[minmax(0,1.9fr)_140px_120px_120px_92px] items-center gap-3 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+          <div
+            className={`grid ${EXPENSE_TABLE_GRID_COLUMNS} items-center gap-4 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground`}
+          >
             <span>Description</span>
             <span>Category</span>
             <span>Date</span>
-            <span className="text-right">Amount</span>
-            <span className="text-right">Actions</span>
+            <span className="justify-self-end">Amount</span>
+            <span className="justify-self-end">Actions</span>
           </div>
         </div>
 
@@ -179,6 +189,24 @@ export function HomeStats() {
             );
           })}
         </div>
+
+        {hasMoreExpenses && (
+          <div className="border-t border-border/60 px-4 py-3">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="w-full"
+              onClick={() =>
+                setVisibleCount((count) =>
+                  Math.min(count + LOAD_MORE_STEP, expenses.length)
+                )
+              }
+            >
+              Load {Math.min(LOAD_MORE_STEP, remainingExpenses)} more
+            </Button>
+          </div>
+        )}
       </div>
 
       <ExpenseEditDialog
