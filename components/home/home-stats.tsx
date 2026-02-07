@@ -22,9 +22,9 @@ const LOAD_MORE_STEP = 5;
 
 function TransactionsCardHeader({ count }: { count: number }) {
   return (
-    <div className="flex items-center justify-between border-b border-border/60 px-4 py-3">
-      <h2 className="text-sm font-semibold text-foreground">Recent Transactions</h2>
-      <span className="rounded-full border border-border/80 bg-muted/30 px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
+    <div className="flex items-center justify-between border-b border-border/50 px-4 py-2.5">
+      <h2 className="text-[13px] font-semibold tracking-tight text-foreground">Recent Transactions</h2>
+      <span className="rounded-md border border-border/60 bg-muted/20 px-2 py-0.5 text-[11px] font-semibold tabular-nums text-muted-foreground">
         {count}
       </span>
     </div>
@@ -35,11 +35,11 @@ function LoadingState() {
   return (
     <div className="w-full max-w-3xl mx-auto">
       <div className="rounded-xl border border-border/70 bg-card shadow-sm">
-        <div className="flex items-center justify-between border-b border-border/60 px-4 py-3">
-          <h2 className="text-sm font-semibold text-foreground">Recent Transactions</h2>
-          <div className="h-6 w-12 rounded-full bg-muted/60" />
+        <div className="flex items-center justify-between border-b border-border/50 px-4 py-2.5">
+          <h2 className="text-[13px] font-semibold tracking-tight text-foreground">Recent Transactions</h2>
+          <div className="h-5 w-10 rounded-md bg-muted/60" />
         </div>
-        <div className="flex items-center justify-center py-14">
+        <div className="flex items-center justify-center py-12">
           <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
         </div>
       </div>
@@ -52,12 +52,12 @@ function EmptyState() {
     <div className="w-full max-w-3xl mx-auto">
       <div className="rounded-xl border border-border/70 bg-card shadow-sm">
         <TransactionsCardHeader count={0} />
-        <div className="flex flex-col items-center justify-center px-4 py-14 text-center">
-          <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full border border-border/70 bg-muted/40 text-muted-foreground">
-            <ReceiptText className="h-4 w-4" />
+        <div className="flex flex-col items-center justify-center px-4 py-12 text-center">
+          <div className="mb-2.5 flex h-9 w-9 items-center justify-center rounded-lg border border-border/60 bg-muted/30 text-muted-foreground">
+            <ReceiptText className="h-3.5 w-3.5" />
           </div>
-          <p className="text-sm font-medium text-foreground">No transactions yet</p>
-          <p className="mt-1 text-xs text-muted-foreground">
+          <p className="text-[13px] font-semibold text-foreground">No transactions yet</p>
+          <p className="mt-0.5 text-[11px] text-muted-foreground">
             Add your first expense to start tracking.
           </p>
         </div>
@@ -138,9 +138,9 @@ export function HomeStats() {
       <div className="overflow-hidden rounded-xl border border-border/70 bg-card shadow-sm">
         <TransactionsCardHeader count={expenses.length} />
 
-        <div className="hidden border-b border-border/50 bg-muted/30 px-4 py-2 md:block">
+        <div className="hidden border-b border-border/40 bg-muted/20 px-4 py-1.5 md:block">
           <div
-            className={`grid ${EXPENSE_TABLE_GRID_COLUMNS} items-center gap-4 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground`}
+            className={`grid ${EXPENSE_TABLE_GRID_COLUMNS} items-center gap-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80`}
           >
             <span>Description</span>
             <span>Category</span>
@@ -150,7 +150,7 @@ export function HomeStats() {
           </div>
         </div>
 
-        <div className="hidden divide-y divide-border/60 md:block">
+        <div className="hidden divide-y divide-border/40 md:block">
           {displayedExpenses.map((expense) => {
             const isPendingDelete = pendingDeleteId === expense.id;
 
@@ -170,7 +170,7 @@ export function HomeStats() {
           })}
         </div>
 
-        <div className="divide-y divide-border/60 md:hidden">
+        <div className="divide-y divide-border/40 md:hidden">
           {displayedExpenses.map((expense) => {
             const isPendingDelete = pendingDeleteId === expense.id;
 
@@ -191,12 +191,12 @@ export function HomeStats() {
         </div>
 
         {hasMoreExpenses && (
-          <div className="border-t border-border/60 px-4 py-3">
+          <div className="border-t border-border/40 px-4 py-2.5">
             <Button
               type="button"
               variant="outline"
               size="sm"
-              className="w-full"
+              className="w-full text-[11px] font-semibold"
               onClick={() =>
                 setVisibleCount((count) =>
                   Math.min(count + LOAD_MORE_STEP, expenses.length)

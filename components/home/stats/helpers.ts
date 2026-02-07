@@ -4,7 +4,7 @@ import { dateOnlyStringToDate, formatRelativeDateLabel } from "@/lib/date";
 
 export const CONFIRM_TIMEOUT_MS = 3000;
 export const EXPENSE_TABLE_GRID_COLUMNS =
-  "grid-cols-[minmax(0,1fr)_8.5rem_6.5rem_7.5rem_5.5rem]";
+  "grid-cols-[minmax(0,1fr)_7rem_5.5rem_6.5rem_4.5rem]";
 
 export function formatExpenseCurrency(amount: string) {
   return new Intl.NumberFormat("en-US", {

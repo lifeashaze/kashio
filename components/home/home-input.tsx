@@ -15,11 +15,6 @@ import type { ParsedExpense, ValidatedExpense } from "@/lib/types/expense";
 import { apiClient, ApiError } from "@/lib/api/client";
 import { useCreateExpense } from "@/lib/hooks/use-expenses";
 
-const QUICK_EXAMPLES = [
-  "$12 breakfast sandwich",
-  "Uber $24 downtown",
-  "Groceries 86.40 yesterday",
-];
 
 export function HomeInput() {
   const createExpense = useCreateExpense();
@@ -202,27 +197,6 @@ export function HomeInput() {
           </Button>
         </div>
       </form>
-
-      <div className="grid w-full grid-cols-2 gap-2.5 sm:grid-cols-3">
-        {QUICK_EXAMPLES.map((example, index) => (
-          <button
-            key={example}
-            type="button"
-            onClick={() => {
-              setInput(example);
-              inputRef.current?.focus();
-            }}
-            disabled={isLoading}
-            className={`h-11 w-full cursor-pointer rounded-xl bg-card px-3 text-center text-sm font-medium text-foreground shadow-sm ring-1 ring-border/60 transition-colors hover:bg-muted/70 hover:ring-primary/30 disabled:pointer-events-none disabled:opacity-50 ${
-              index === 2
-                ? "col-span-2 w-[calc(50%-0.3125rem)] justify-self-center sm:col-span-1 sm:w-full"
-                : ""
-            }`}
-          >
-            {example}
-          </button>
-        ))}
-      </div>
 
       {/* Status Feedback */}
       {status === "parsing" && (

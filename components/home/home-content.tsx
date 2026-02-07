@@ -1,6 +1,8 @@
 "use client";
 
 import { HomeHeader, HomeInput, HomeStats } from "@/components/home";
+import { MonthlyBudgetMetrics } from "@/components/home/monthly-budget-metrics";
+import { ExpenseAnalytics } from "@/components/home/expense-analytics";
 
 export function HomeContent({ user }: { user: { name: string; email: string } }) {
   return (
@@ -9,7 +11,9 @@ export function HomeContent({ user }: { user: { name: string; email: string } })
         <HomeHeader user={user} />
         <HomeInput />
       </div>
-      <div className="w-full pt-6">
+      <div className="w-full space-y-6 pt-6">
+        <MonthlyBudgetMetrics />
+        <ExpenseAnalytics />
         <HomeStats />
       </div>
     </main>
