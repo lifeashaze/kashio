@@ -8,6 +8,7 @@ import { BudgetStep } from "./steps/budget-step";
 import { CategoriesStep } from "./steps/categories-step";
 import { useSaveUserPreferences, useUpdateOnboardingStatus } from "@/lib/hooks/use-user-preferences";
 import { toast } from "sonner";
+import { DEFAULT_MONTHLY_BUDGET } from "@/lib/constants/budget";
 
 const TOTAL_STEPS = 2;
 
@@ -23,7 +24,7 @@ export function OnboardingWizard() {
   const updateOnboarding = useUpdateOnboardingStatus();
 
   const [formData, setFormData] = useState({
-    monthlyBudget: 2000,
+    monthlyBudget: DEFAULT_MONTHLY_BUDGET,
     currency: "USD",
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "America/Los_Angeles",
     language: "en",

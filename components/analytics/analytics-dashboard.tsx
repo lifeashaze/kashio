@@ -8,6 +8,7 @@ import { Calendar as CalendarIcon, ArrowLeft } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
+import { AnalyticsDashboardSkeleton } from "@/components/skeletons";
 import { format } from "date-fns";
 import Link from "next/link";
 import { SpendingChart } from "./spending-chart";
@@ -18,8 +19,9 @@ import { SpendingVsBudget } from "./spending-vs-budget";
 type DateRangeType = "month" | "year" | "custom";
 
 export function AnalyticsDashboard() {
-  const { data: expenses = [] } = useExpenses();
-  const { data: prefs } = useUserPreferences();
+  const { data: expenses = [], isLoading: isLoadingExpenses } = useExpenses();
+  const { data: prefs, isLoading: isLoadingPrefs } = useUserPreferences();
+  const isLoading = isLoadingExpenses || isLoadingPrefs;
   const [dateRangeType, setDateRangeType] = useState<DateRangeType>("month");
   const [customDateFrom, setCustomDateFrom] = useState<Date>();
   const [customDateTo, setCustomDateTo] = useState<Date>();
@@ -140,6 +142,10 @@ export function AnalyticsDashboard() {
     }
     return "Select date range";
   };
+
+  if (isLoading) {
+    return <AnalyticsDashboardSkeleton />;
+  }
 
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 sm:px-6 pb-16 pt-6">

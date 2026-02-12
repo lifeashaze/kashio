@@ -4,6 +4,7 @@ import { useMemo, useState, useEffect } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
 import type { Expense } from "@/lib/schema";
 import { useUserPreferences } from "@/lib/hooks/use-user-preferences";
+import { DEFAULT_MONTHLY_BUDGET } from "@/lib/constants/budget";
 
 interface TooltipProps {
   active?: boolean;
@@ -37,7 +38,7 @@ interface SpendingVsBudgetProps {
 
 export function SpendingVsBudget({ expenses, dateRangeType, selectedMonth, selectedYear }: SpendingVsBudgetProps) {
   const { data: prefs } = useUserPreferences();
-  const monthlyBudget = prefs ? parseFloat(prefs.monthlyBudget) : 2000;
+  const monthlyBudget = prefs ? parseFloat(prefs.monthlyBudget) : DEFAULT_MONTHLY_BUDGET;
 
   const [isDark, setIsDark] = useState(false);
 

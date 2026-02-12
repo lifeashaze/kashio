@@ -4,6 +4,8 @@ import { TrendingDown, TrendingUp, Calendar, Wallet } from "lucide-react";
 import { useExpenses } from "@/lib/hooks/use-expenses";
 import { useUserPreferences } from "@/lib/hooks/use-user-preferences";
 import { useMemo } from "react";
+import { DEFAULT_MONTHLY_BUDGET } from "@/lib/constants/budget";
+import { MonthlyBudgetSkeleton } from "@/components/skeletons";
 
 function getDaysLeftInMonth() {
   const now = new Date();
@@ -17,11 +19,12 @@ function getMonthName() {
 }
 
 export function MonthlyBudgetMetrics() {
-  const { data: expenses = [] } = useExpenses();
-  const { data: prefs } = useUserPreferences();
+  const { data: expenses = [], isLoading: isLoadingExpenses } = useExpenses();
+  const { data: prefs, isLoading: isLoadingPrefs } = useUserPreferences();
 
-  const MONTHLY_BUDGET = prefs ? parseFloat(prefs.monthlyBudget) : 2000;
+  const MONTHLY_BUDGET = prefs ? parseFloat(prefs.monthlyBudget) : DEFAULT_MONTHLY_BUDGET;
   const CURRENCY = prefs?.currency || "USD";
+  const isLoading = isLoadingExpenses || isLoadingPrefs;
 
   const monthlyStats = useMemo(() => {
     const now = new Date();
@@ -66,6 +69,10 @@ export function MonthlyBudgetMetrics() {
       maximumFractionDigits: 0,
     }).format(amount);
   };
+
+  if (isLoading) {
+    return <MonthlyBudgetSkeleton />;
+  }
 
   return (
     <div className="w-full max-w-3xl mx-auto">

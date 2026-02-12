@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { TrendingUp, DollarSign } from "lucide-react";
+import { DEFAULT_MONTHLY_BUDGET } from "@/lib/constants/budget";
 
 interface BudgetStepProps {
   monthlyBudget: number;
@@ -59,7 +60,7 @@ export function BudgetStep({
             step="1"
             value={monthlyBudget || ""}
             onChange={(e) => onMonthlyBudgetChange(parseFloat(e.target.value) || 0)}
-            placeholder="2000"
+            placeholder={DEFAULT_MONTHLY_BUDGET.toString()}
             className="h-11 text-lg"
           />
         </div>
