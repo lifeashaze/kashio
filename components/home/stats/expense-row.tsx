@@ -33,6 +33,7 @@ type ExpenseRowProps = {
   isDeletingCurrent: boolean;
   disableEdit: boolean;
   disableDelete: boolean;
+  currency?: string;
   onEdit: () => void;
   onDelete: () => void;
 };
@@ -128,6 +129,7 @@ export function ExpenseRow({
   isDeletingCurrent,
   disableEdit,
   disableDelete,
+  currency = "USD",
   onEdit,
   onDelete,
 }: ExpenseRowProps) {
@@ -185,7 +187,7 @@ export function ExpenseRow({
 
         <div className="justify-self-end">
           <span className="inline-flex min-w-[5.5rem] justify-end font-mono text-[13px] font-bold tabular-nums tracking-tight text-foreground">
-            {formatExpenseCurrency(expense.amount)}
+            {formatExpenseCurrency(expense.amount, currency)}
           </span>
         </div>
 
@@ -231,7 +233,7 @@ export function ExpenseRow({
           </div>
         </div>
         <span className="shrink-0 font-mono text-[13px] font-bold tabular-nums tracking-tight text-foreground">
-          {formatExpenseCurrency(expense.amount)}
+          {formatExpenseCurrency(expense.amount, currency)}
         </span>
       </div>
 

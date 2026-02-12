@@ -8,6 +8,7 @@ import {
   useExpenses,
   useUpdateExpense,
 } from "@/lib/hooks/use-expenses";
+import { useUserPreferences } from "@/lib/hooks/use-user-preferences";
 import type { UpdateExpensePayload } from "@/lib/types/expense";
 import { ExpenseEditDialog } from "@/components/home/stats/expense-edit-dialog";
 import { ExpenseRow } from "@/components/home/stats/expense-row";
@@ -68,8 +69,11 @@ function EmptyState() {
 
 export function HomeStats() {
   const { data: expenses = [], isLoading } = useExpenses();
+  const { data: prefs } = useUserPreferences();
   const deleteExpense = useDeleteExpense();
   const updateExpense = useUpdateExpense();
+
+  const currency = prefs?.currency || "USD";
 
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
@@ -163,6 +167,7 @@ export function HomeStats() {
                 isDeletingCurrent={deleteExpense.isPending && isPendingDelete}
                 disableEdit={deleteExpense.isPending || updateExpense.isPending}
                 disableDelete={updateExpense.isPending}
+                currency={currency}
                 onEdit={() => setEditingExpense(expense)}
                 onDelete={() => handleDelete(expense.id)}
               />
@@ -183,6 +188,7 @@ export function HomeStats() {
                 isDeletingCurrent={deleteExpense.isPending && isPendingDelete}
                 disableEdit={deleteExpense.isPending || updateExpense.isPending}
                 disableDelete={updateExpense.isPending}
+                currency={currency}
                 onEdit={() => setEditingExpense(expense)}
                 onDelete={() => handleDelete(expense.id)}
               />

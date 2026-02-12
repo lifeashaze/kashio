@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { LogOut, User } from "lucide-react";
+import { useRouter, usePathname } from "next/navigation";
+import { LogOut, User, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { getUserInitials } from "@/lib/user";
+import { cn } from "@/lib/utils";
 
 interface HomeNavProps {
   user: {
@@ -19,6 +20,7 @@ interface HomeNavProps {
 
 export function HomeNav({ user }: HomeNavProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const [showMenu, setShowMenu] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
 
@@ -36,11 +38,40 @@ export function HomeNav({ user }: HomeNavProps) {
   };
 
   return (
-    <nav className="sticky top-0 z-30 bg-background">
-      <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-6">
-        <Link href="/" className="font-heading text-xl font-bold tracking-tight text-foreground">
-          kashio
-        </Link>
+    <nav className="sticky top-0 z-30 bg-background border-b border-border/40">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
+        <div className="flex items-center gap-8">
+          <Link href="/home" className="font-heading text-xl font-bold tracking-tight text-foreground">
+            kashio
+          </Link>
+          <div className="hidden sm:flex items-center gap-1">
+            <Link href="/home">
+              <Button
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  "text-sm font-medium",
+                  pathname === "/home" && "bg-accent"
+                )}
+              >
+                Home
+              </Button>
+            </Link>
+            <Link href="/analytics">
+              <Button
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  "text-sm font-medium gap-2",
+                  pathname === "/analytics" && "bg-accent"
+                )}
+              >
+                <BarChart3 className="h-4 w-4" />
+                Analytics
+              </Button>
+            </Link>
+          </div>
+        </div>
         <div className="flex items-center gap-3">
           <ThemeToggle />
           <div className="relative">

@@ -2,10 +2,8 @@
 
 import { TrendingDown, TrendingUp, Calendar, Wallet } from "lucide-react";
 import { useExpenses } from "@/lib/hooks/use-expenses";
+import { useUserPreferences } from "@/lib/hooks/use-user-preferences";
 import { useMemo } from "react";
-
-// This would typically come from user settings/preferences
-const MONTHLY_BUDGET = 2000;
 
 function getDaysLeftInMonth() {
   const now = new Date();
@@ -20,6 +18,10 @@ function getMonthName() {
 
 export function MonthlyBudgetMetrics() {
   const { data: expenses = [] } = useExpenses();
+  const { data: prefs } = useUserPreferences();
+
+  const MONTHLY_BUDGET = prefs ? parseFloat(prefs.monthlyBudget) : 2000;
+  const CURRENCY = prefs?.currency || "USD";
 
   const monthlyStats = useMemo(() => {
     const now = new Date();
@@ -54,12 +56,12 @@ export function MonthlyBudgetMetrics() {
       projectedTotal,
       isOverBudget: totalSpent > MONTHLY_BUDGET,
     };
-  }, [expenses]);
+  }, [expenses, MONTHLY_BUDGET]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
-      currency: "USD",
+      currency: CURRENCY,
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(amount);

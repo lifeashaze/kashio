@@ -1,26 +1,30 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { betterFetch } from "@better-fetch/fetch";
+import type { Session } from "better-auth/types";
+import { NextResponse, type NextRequest } from "next/server";
 
-const protectedRoutePrefixes = ["/home", "/profile"];
-const authRoutes = ["/login", "/signup"];
+export async function middleware(request: NextRequest) {
+  const { data: session } = await betterFetch<Session>(
+    "/api/auth/get-session",
+    {
+      baseURL: request.nextUrl.origin,
+      headers: {
+        cookie: request.headers.get("cookie") || "",
+      },
+    },
+  );
 
-function isProtectedRoute(pathname: string) {
-  return protectedRoutePrefixes.some((prefix) => pathname.startsWith(prefix));
-}
+  const isAuthRoute = request.nextUrl.pathname.startsWith("/login") ||
+                      request.nextUrl.pathname.startsWith("/signup");
+  const isProtectedRoute = request.nextUrl.pathname.startsWith("/home") ||
+                           request.nextUrl.pathname.startsWith("/profile");
 
-export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-
-  const sessionCookie = request.cookies.get("better-auth.session_token");
-  const hasSession = !!sessionCookie;
-
-  // Don't redirect auth routes if there's a session cookie
-  // Let the page handle invalid sessions
-  if (authRoutes.includes(pathname) && hasSession) {
+  // Redirect authenticated users away from login/signup to home
+  if (session && isAuthRoute) {
     return NextResponse.redirect(new URL("/home", request.url));
   }
 
-  if (isProtectedRoute(pathname) && !hasSession) {
+  // Redirect unauthenticated users to login
+  if (!session && isProtectedRoute) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
@@ -28,7 +32,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico).*)",
-  ],
+  matcher: ["/((?!api|_next/static|_next/image|.*\\.png$).*)"],
 };

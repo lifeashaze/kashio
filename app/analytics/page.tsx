@@ -1,10 +1,10 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { HomeNav, HomeContent } from "@/components/home";
-// import { OnboardingWizard } from "@/components/onboarding/onboarding-wizard";
+import { HomeNav } from "@/components/home";
+import { AnalyticsDashboard } from "@/components/analytics/analytics-dashboard";
 
-export default async function HomePage() {
+export default async function AnalyticsPage() {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -13,13 +13,10 @@ export default async function HomePage() {
     redirect("/api/clear-session");
   }
 
-  // const showOnboarding = !session.user.onboardingCompleted;
-
   return (
     <div className="min-h-screen bg-background">
       <HomeNav user={session.user} />
-      <HomeContent user={session.user} />
-      {/* {showOnboarding && <OnboardingWizard />} */}
+      <AnalyticsDashboard />
     </div>
   );
 }

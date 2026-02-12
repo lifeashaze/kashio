@@ -6,10 +6,10 @@ export const CONFIRM_TIMEOUT_MS = 3000;
 export const EXPENSE_TABLE_GRID_COLUMNS =
   "grid-cols-[minmax(0,1fr)_7rem_5.5rem_6.5rem_4.5rem]";
 
-export function formatExpenseCurrency(amount: string) {
+export function formatExpenseCurrency(amount: string, currency: string = "USD") {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency: "USD",
+    currency: currency,
     minimumFractionDigits: 2,
   }).format(Number(amount));
 }
