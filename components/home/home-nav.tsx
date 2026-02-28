@@ -2,14 +2,13 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
-import { LogOut, User, BarChart3 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { LogOut, MessageSquare, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { getUserInitials } from "@/lib/user";
-import { cn } from "@/lib/utils";
 
 interface HomeNavProps {
   user: {
@@ -20,7 +19,6 @@ interface HomeNavProps {
 
 export function HomeNav({ user }: HomeNavProps) {
   const router = useRouter();
-  const pathname = usePathname();
   const [showMenu, setShowMenu] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
 
@@ -38,41 +36,20 @@ export function HomeNav({ user }: HomeNavProps) {
   };
 
   return (
-    <nav className="sticky top-0 z-30 bg-background border-b border-border/40">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-        <div className="flex items-center gap-8">
-          <Link href="/home" className="font-heading text-xl font-bold tracking-tight text-foreground">
+    <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl">
+      <div className="mx-auto max-w-5xl px-6">
+        <div className="flex h-16 items-center justify-between">
+          <Link href="/home" className="cursor-pointer font-heading text-xl font-bold tracking-tight text-foreground">
             kashio
           </Link>
-          <div className="hidden sm:flex items-center gap-1">
-            <Link href="/home">
-              <Button
-                variant="ghost"
-                size="sm"
-                className={cn(
-                  "text-sm font-medium",
-                  pathname === "/home" && "bg-accent"
-                )}
-              >
-                Home
-              </Button>
-            </Link>
-            <Link href="/analytics">
-              <Button
-                variant="ghost"
-                size="sm"
-                className={cn(
-                  "text-sm font-medium gap-2",
-                  pathname === "/analytics" && "bg-accent"
-                )}
-              >
-                <BarChart3 className="h-4 w-4" />
-                Analytics
-              </Button>
-            </Link>
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+          <Link
+            href="/chat"
+            className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+          >
+            <MessageSquare className="size-4" />
+            <span className="hidden sm:inline">Ask AI</span>
+          </Link>
           <ThemeToggle />
           <div className="relative">
             <Button
@@ -125,6 +102,7 @@ export function HomeNav({ user }: HomeNavProps) {
             )}
           </div>
         </div>
+      </div>
       </div>
     </nav>
   );

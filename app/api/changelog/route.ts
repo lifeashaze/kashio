@@ -5,6 +5,7 @@ import { z } from "zod";
 import { created, success } from "@/lib/api/responses";
 import {
   parseRequestBody,
+  requireRouteAuth,
   withServerErrorBoundary,
 } from "@/lib/api/route-helpers";
 
@@ -32,6 +33,9 @@ export async function GET() {
 
 export async function POST(request: Request) {
   return withServerErrorBoundary("create changelog entry", async () => {
+    const auth = await requireRouteAuth();
+    if (!auth.ok) return auth.response;
+
     const body = await parseRequestBody(request, changelogRequestSchema);
     if (!body.ok) return body.response;
 

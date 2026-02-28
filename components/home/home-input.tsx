@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { Plus, Check, AlertCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { ExpenseConfirmationDialog } from "./expense-confirmation-dialog";
 import { CATEGORY_ICONS } from "@/lib/constants/categories";
 import {
@@ -207,10 +208,16 @@ export function HomeInput() {
       )}
 
       {parsedExpense && parsedExpense.isValidExpense && parsedExpense.amount != null && parsedExpense.description && (
-        <div className="space-y-2 sm:space-y-3 rounded-lg sm:rounded-xl border border-border/60 bg-card p-3 sm:p-4 shadow-sm">
-          {/* Mobile: Stack vertically, Desktop: Single line */}
-          <div className="space-y-2 sm:space-y-0 sm:flex sm:items-center sm:justify-between">
-            {/* Main expense info */}
+        <div
+          className={cn(
+            "rounded-lg sm:rounded-xl border bg-card p-3 sm:p-4 shadow-sm transition-colors duration-300",
+            status === "saved"
+              ? "border-green-300/50 dark:border-green-700/40"
+              : "border-border/60"
+          )}
+        >
+          {/* Main expense info */}
+          <div className="flex items-start justify-between gap-2">
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs sm:text-sm">
               <span className="text-base sm:text-lg">
                 {CATEGORY_ICONS[parsedExpense.category]}
@@ -220,49 +227,37 @@ export function HomeInput() {
               </span>
               <span className="text-muted-foreground">for</span>
               <span className="font-medium text-foreground">{parsedExpense.description}</span>
-
-              {/* Metadata on new line on mobile */}
               <div className="flex flex-wrap items-center gap-x-2 gap-y-1 w-full sm:w-auto sm:contents">
                 <span className="hidden sm:inline text-muted-foreground">•</span>
-                <span className="capitalize text-muted-foreground">
-                  {parsedExpense.category}
-                </span>
+                <span className="capitalize text-muted-foreground">{parsedExpense.category}</span>
                 <span className="text-muted-foreground">•</span>
                 <span className="text-muted-foreground text-[10px] sm:text-xs">
                   {formatDate(parsedExpense.date)}
                 </span>
               </div>
             </div>
-
-            {/* Parse time */}
             {parseTime !== null && (
-              <span className="text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap">
+              <span className="text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap shrink-0">
                 {parseTime}ms
               </span>
             )}
           </div>
 
+          {/* Save status */}
           {status === "saving" && (
-            <p className="text-[10px] sm:text-xs text-muted-foreground">
-              Saving to database...
-            </p>
-          )}
-          {status === "saved" && (
-            <div className="flex items-center gap-1.5 text-[10px] sm:text-xs text-green-600">
-              <Check className="h-3 w-3" />
-              <span>Saved successfully!</span>
+            <div className="mt-2.5 flex items-center gap-1.5 text-[10px] sm:text-xs text-muted-foreground">
+              <Loader2 className="h-3 w-3 animate-spin" />
+              <span>Saving...</span>
             </div>
           )}
-
-          {/* Debug Mode - JSON Output */}
-          <details className="mt-2 sm:mt-3">
-            <summary className="cursor-pointer text-[10px] sm:text-xs text-muted-foreground hover:text-foreground">
-              Debug Output
-            </summary>
-            <pre className="mt-2 overflow-x-auto rounded-lg bg-muted p-2 sm:p-3 text-[10px] sm:text-xs">
-              {JSON.stringify(parsedExpense, null, 2)}
-            </pre>
-          </details>
+          {status === "saved" && (
+            <div className="mt-2.5">
+              <span className="inline-flex items-center gap-1 rounded-full bg-green-100 dark:bg-green-900/30 px-2.5 py-0.5 text-[10px] sm:text-xs font-medium text-green-700 dark:text-green-400">
+                <Check className="h-2.5 w-2.5" />
+                Logged
+              </span>
+            </div>
+          )}
         </div>
       )}
 

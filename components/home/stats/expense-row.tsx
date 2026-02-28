@@ -208,46 +208,46 @@ export function ExpenseRow({
   return (
     <div
       className={cn(
-        "space-y-2 px-4 py-2.5 transition-all",
+        "space-y-1.5 px-4 py-2 transition-all",
         isPendingDelete && "bg-destructive/10 shadow-inner"
       )}
     >
       <div className="flex items-start justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-2.5">
+        <div className="flex min-w-0 items-center gap-2">
           <div
             className={cn(
-              "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border",
+              "flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border",
               iconClassName
             )}
           >
-            <CategoryIcon className="h-3.5 w-3.5" />
+            <CategoryIcon className="h-3 w-3" />
           </div>
 
           <div className="min-w-0">
             <p
-              className="truncate text-[13px] font-semibold leading-tight text-foreground"
+              className="truncate text-[12px] font-semibold leading-tight text-foreground"
               title={expense.rawInput}
             >
               {expense.description}
             </p>
           </div>
         </div>
-        <span className="shrink-0 font-mono text-[13px] font-bold tabular-nums tracking-tight text-foreground">
+        <span className="shrink-0 font-mono text-[12px] font-bold tabular-nums tracking-tight text-foreground">
           {formatExpenseCurrency(expense.amount, currency)}
         </span>
       </div>
 
       <div className="flex items-center justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-2">
+        <div className="flex min-w-0 items-center gap-1.5">
           <span
             className={cn(
-              "inline-flex h-5 items-center rounded-md border px-1.5 text-[10px] font-bold uppercase tracking-wide",
+              "inline-flex h-4 items-center rounded-md border px-1.5 text-[9px] font-bold uppercase tracking-wide",
               badgeClassName
             )}
           >
             {CATEGORY_LABELS[category]}
           </span>
-          <span className="truncate text-[11px] font-medium text-muted-foreground">
+          <span className="truncate text-[10px] font-medium text-muted-foreground">
             {formatExpenseDate(expense.date)}
           </span>
         </div>
