@@ -21,7 +21,7 @@ export async function POST(req: Request) {
       .insert(expenses)
       .values({
         userId: auth.data.user.id,
-        amount: body.data.amount,
+        amount: String(body.data.amount),
         description: body.data.description,
         category: body.data.category,
         date: body.data.date,

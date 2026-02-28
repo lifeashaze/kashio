@@ -36,7 +36,6 @@ export function ChatInterface({ userName }: ChatInterfaceProps) {
   const isStreaming = status === "streaming";
   const isBusy = isWaiting || isStreaming;
 
-  // Scroll to bottom as tokens stream in
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, status]);

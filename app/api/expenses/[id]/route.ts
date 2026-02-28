@@ -54,7 +54,7 @@ export async function PUT(
     const updated = await db
       .update(expenses)
       .set({
-        amount: body.data.amount,
+        amount: String(body.data.amount),
         description: body.data.description,
         category: body.data.category,
         date: body.data.date,
