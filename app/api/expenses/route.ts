@@ -8,7 +8,6 @@ import {
 } from "@/lib/api/route-helpers";
 import { desc, eq } from "drizzle-orm";
 import { createExpenseSchema } from "@/lib/expenses/schemas";
-
 export async function POST(req: Request) {
   return withServerErrorBoundary("create expense", async () => {
     const auth = await requireRouteAuth();

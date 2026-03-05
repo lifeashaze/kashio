@@ -161,12 +161,14 @@ export function ExpenseRow({
           </div>
 
           <div className="min-w-0">
-            <p
-              className="truncate text-[13px] font-semibold leading-tight text-foreground"
-              title={expense.rawInput}
-            >
-              {expense.description}
-            </p>
+            <div className="flex items-center gap-1.5">
+              <p
+                className="truncate text-[13px] font-semibold leading-tight text-foreground"
+                title={expense.rawInput}
+              >
+                {expense.description}
+              </p>
+            </div>
           </div>
         </div>
 
@@ -224,12 +226,14 @@ export function ExpenseRow({
           </div>
 
           <div className="min-w-0">
-            <p
-              className="truncate text-[12px] font-semibold leading-tight text-foreground"
-              title={expense.rawInput}
-            >
-              {expense.description}
-            </p>
+            <div className="flex items-center gap-1">
+              <p
+                className="truncate text-[12px] font-semibold leading-tight text-foreground"
+                title={expense.rawInput}
+              >
+                {expense.description}
+              </p>
+            </div>
           </div>
         </div>
         <span className="shrink-0 font-mono text-[12px] font-bold tabular-nums tracking-tight text-foreground">

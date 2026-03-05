@@ -1,7 +1,7 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { Plus, Check, AlertCircle, Loader2 } from "lucide-react";
+import { useRef, useState, useEffect } from "react";
+import { Plus, Check, AlertCircle, Loader2, Mic, MicOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ExpenseConfirmationDialog } from "./expense-confirmation-dialog";
@@ -15,12 +15,17 @@ import { formatRelativeDateLabel } from "@/lib/date";
 import type { ParsedExpense, ValidatedExpense } from "@/lib/types/expense";
 import { apiClient, ApiError } from "@/lib/api/client";
 import { useCreateExpense } from "@/lib/hooks/use-expenses";
-
+import { useVoiceInput } from "@/lib/hooks/use-voice-input";
 
 export function HomeInput() {
   const createExpense = useCreateExpense();
   const [input, setInput] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const voice = useVoiceInput();
+  const [supportsMediaRecorder, setSupportsMediaRecorder] = useState(false);
+  useEffect(() => {
+    setSupportsMediaRecorder(typeof MediaRecorder !== "undefined");
+  }, []);
   const [status, setStatus] = useState<
     "idle" | "parsing" | "saving" | "saved" | "error"
   >("idle");
@@ -76,13 +81,8 @@ export function HomeInput() {
     }
   };
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    const trimmed = input.trim();
-    if (!trimmed) return;
-
-    const currentInput = trimmed;
-    setCurrentRawInput(currentInput);
+  const parseAndHandle = async (rawInput: string) => {
+    setCurrentRawInput(rawInput);
     const start = Date.now();
     setParseTime(null);
     setParsedExpense(null);
@@ -90,16 +90,14 @@ export function HomeInput() {
     setStatus("parsing");
 
     try {
-      // Parse expense with AI
       const parsed = await apiClient.post<ParsedExpense>("/api/parse-expense", {
-        prompt: currentInput,
+        prompt: rawInput,
       });
 
       setParsedExpense(parsed);
       setParseTime(Date.now() - start);
       setStatus("idle");
 
-      // Case 1: Not an expense at all
       if (!parsed.isValidExpense) {
         showValidationError(
           `${parsed.reasoning} Try something like: "$15 lunch" or "coffee $5 this morning"`
@@ -107,7 +105,6 @@ export function HomeInput() {
         return;
       }
 
-      // Case 2: Missing amount (critical field)
       if (parsed.missingFields.includes("amount")) {
         showValidationError(
           "I couldn't find an amount. Please include how much you spent (e.g., '$15' or '15 dollars')"
@@ -115,7 +112,6 @@ export function HomeInput() {
         return;
       }
 
-      // Case 3: Low confidence or missing fields - show confirmation dialog
       if (
         parsed.confidence === "low" ||
         parsed.missingFields.length > 0 ||
@@ -125,7 +121,6 @@ export function HomeInput() {
         return;
       }
 
-      // Case 4: High confidence - auto-save with preview
       if (parsed.amount && parsed.description) {
         await saveExpense(
           {
@@ -134,13 +129,34 @@ export function HomeInput() {
             category: parsed.category,
             date: parsed.date,
           },
-          currentInput
+          rawInput
         );
       }
     } catch (error) {
       setError(resolveErrorMessage(error));
       setStatus("error");
       scheduleReset(ERROR_DISPLAY_DURATION);
+    }
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    const trimmed = input.trim();
+    if (!trimmed) return;
+    await parseAndHandle(trimmed);
+  };
+
+  const handleVoiceClick = async () => {
+    if (voice.status === "recording") {
+      try {
+        const text = await voice.stopRecording();
+        if (text.trim()) await parseAndHandle(text.trim());
+      } catch {
+        // error already set in hook
+      }
+    } else if (voice.status === "idle" || voice.status === "error") {
+      voice.reset();
+      await voice.startRecording();
     }
   };
 
@@ -166,6 +182,31 @@ export function HomeInput() {
                 disabled={isLoading}
               />
           </div>
+          {supportsMediaRecorder && (
+            <Button
+              type="button"
+              size="lg"
+              variant="outline"
+              onClick={handleVoiceClick}
+              disabled={isLoading || voice.status === "transcribing"}
+              className={cn(
+                "h-11 w-11 shrink-0 rounded-xl p-0",
+                voice.status === "recording" && "border-red-400 bg-red-50 text-red-600 dark:border-red-700 dark:bg-red-950 dark:text-red-400"
+              )}
+              title={voice.status === "recording" ? "Stop recording" : "Record voice"}
+            >
+              {voice.status === "transcribing" ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : voice.status === "recording" ? (
+                <span className="relative flex h-4 w-4 items-center justify-center">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
+                  <MicOff className="relative h-4 w-4" />
+                </span>
+              ) : (
+                <Mic className="h-4 w-4" />
+              )}
+            </Button>
+          )}
           <Button
             type="submit"
             size="lg"
@@ -268,7 +309,7 @@ export function HomeInput() {
         </div>
       )}
 
-      {/* Confirmation Dialog */}
+      {/* One-time expense confirmation dialog */}
       {parsedExpense && (
         <ExpenseConfirmationDialog
           key={currentRawInput}
@@ -285,6 +326,7 @@ export function HomeInput() {
           }}
         />
       )}
+
     </div>
   );
 }

@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { LogOut, MessageSquare, User } from "lucide-react";
+import { useRouter, usePathname } from "next/navigation";
+import { LogOut, MessageSquare, LayoutDashboard, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { authClient } from "@/lib/auth-client";
@@ -19,6 +19,8 @@ interface HomeNavProps {
 
 export function HomeNav({ user }: HomeNavProps) {
   const router = useRouter();
+  const pathname = usePathname();
+  const isOnChat = pathname === "/chat";
   const [showMenu, setShowMenu] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
 
@@ -44,11 +46,20 @@ export function HomeNav({ user }: HomeNavProps) {
           </Link>
           <div className="flex items-center gap-2 sm:gap-3">
           <Link
-            href="/chat"
+            href={isOnChat ? "/home" : "/chat"}
             className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
           >
-            <MessageSquare className="size-4" />
-            <span className="hidden sm:inline">Ask AI</span>
+            {isOnChat ? (
+              <>
+                <LayoutDashboard className="size-4" />
+                <span className="hidden sm:inline">Dashboard</span>
+              </>
+            ) : (
+              <>
+                <MessageSquare className="size-4" />
+                <span className="hidden sm:inline">Ask AI</span>
+              </>
+            )}
           </Link>
           <ThemeToggle />
           <div className="relative">

@@ -32,6 +32,10 @@ export const auth = betterAuth({
         max: 20,
         storage: "memory",
         customRules: {
+            "/get-session": {
+                window: 60,
+                max: 100,
+            },
             "/sign-in/email": {
                 window: 60,
                 max: 5,

@@ -14,7 +14,7 @@ export default async function ChatPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className="relative flex h-screen flex-col bg-background">
       <HomeNav user={session.user} />
       <ChatInterface userName={session.user.name} />
     </div>

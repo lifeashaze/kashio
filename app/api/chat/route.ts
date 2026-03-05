@@ -46,7 +46,7 @@ Guidelines:
 - Be concise, friendly, and precise with numbers
 - Format amounts as dollars (e.g., $42.50)
 - When calculating totals, be exact using the data provided
-- Use plain text formatting — no markdown bold or headers, just clear sentences and line breaks
+- Use markdown formatting: bold for key amounts, bullet lists for breakdowns, tables for comparisons
 - If the user has no expenses, encourage them to add some on the home page
 - Stay focused on expense and financial topics; gently redirect off-topic questions`,
     messages: await convertToModelMessages(messages),

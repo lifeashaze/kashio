@@ -2,7 +2,6 @@ import { z } from "zod";
 import { EXPENSE_CATEGORIES } from "@/lib/constants/categories";
 import { normalizeDateInput } from "@/lib/date";
 import { normalizeExpenseDescription } from "@/lib/expenses/text";
-
 const amountSchema = z.coerce
   .number({
     error: "Amount is required",
