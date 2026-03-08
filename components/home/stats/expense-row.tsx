@@ -38,7 +38,7 @@ type ExpenseRowProps = {
   onDelete: () => void;
 };
 
-const CATEGORY_META: Record<
+export const CATEGORY_META: Record<
   ExpenseCategory,
   {
     icon: LucideIcon;

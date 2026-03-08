@@ -28,11 +28,18 @@ VALIDATION RULES:
    - Set amount=null if not found in input
    - Set description=null if what was purchased is unclear
 
-5. Description grammar and casing (for DB-ready text):
-   - Return description in English title case
-   - Capitalize major words
-   - Keep minor connector words lowercase unless they are first or last:
-     a, an, and, as, at, but, by, for, from, in, nor, of, on, or, per, the, to, via, vs, with
+5. Description format — always use "Company - Item" when both are present:
+   - If there is an identifiable vendor/company AND a specific item/service, format as:
+     "Company - Item Description"
+     Examples: "CVS - Pain Killers", "Chipotle - Burrito Bowl", "Amazon - Office Supplies"
+   - If only a company name is present (no specific item), return just the company name:
+     "Netflix", "Uber", "Spotify"
+   - If only an item is present with no identifiable company, return just the item:
+     "Monthly Gym Membership", "Parking Ticket"
+   - Use English title case throughout (capitalize major words):
+     - Capitalize the first letter of major words
+     - Keep minor connector words lowercase unless first or last:
+       a, an, and, as, at, but, by, for, from, in, nor, of, on, or, per, the, to, via, vs, with
    - Fix random/mixed casing from user input (e.g., "pRiCeRiTe mARketPlace" -> "Pricerite Marketplace")
    - Do not add trailing punctuation
 
@@ -41,7 +48,13 @@ EXAMPLES:
 - "spent money" → isValidExpense=true, confidence="low", amount=null, description=null, missingFields=["amount","description"]
 - "$50" → isValidExpense=true, confidence="low", amount=50, description=null, missingFields=["description"]
 - "$15 chipotle" → isValidExpense=true, confidence="high", amount=15, description="Chipotle", missingFields=[]
-- "$29 pricerite marketplace" → isValidExpense=true, confidence="high", amount=29, description="Pricerite Marketplace", missingFields=[]
+- "pain killers from cvs $8" → isValidExpense=true, confidence="high", amount=8, description="CVS - Pain Killers", missingFields=[]
+- "chipotle burrito bowl $15" → isValidExpense=true, confidence="high", amount=15, description="Chipotle - Burrito Bowl", missingFields=[]
+- "netflix $15" → isValidExpense=true, confidence="high", amount=15, description="Netflix", missingFields=[]
+- "amazon office supplies $54" → isValidExpense=true, confidence="high", amount=54, description="Amazon - Office Supplies", missingFields=[]
+- "$29 pricerite marketplace groceries" → isValidExpense=true, confidence="high", amount=29, description="Pricerite Marketplace - Groceries", missingFields=[]
+- "morning coffee $4" → isValidExpense=true, confidence="medium", amount=4, description="Morning Coffee", missingFields=[]
+- "uber to airport $45" → isValidExpense=true, confidence="high", amount=45, description="Uber - Ride to Airport", missingFields=[]
 
 DATE HANDLING (YYYY-MM-DD format only):
 - Always return date only (no time)
