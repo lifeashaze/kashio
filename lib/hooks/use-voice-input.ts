@@ -9,6 +9,7 @@ export function useVoiceInput() {
   const [error, setError] = useState<string | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  const startTimeRef = useRef<number | null>(null);
 
   const startRecording = async () => {
     setError(null);
@@ -22,6 +23,7 @@ export function useVoiceInput() {
       };
 
       mediaRecorderRef.current = mediaRecorder;
+      startTimeRef.current = Date.now();
       mediaRecorder.start();
       setStatus("recording");
     } catch {
@@ -41,6 +43,15 @@ export function useVoiceInput() {
       mediaRecorder.onstop = async () => {
         // Stop all tracks to release the mic
         mediaRecorder.stream.getTracks().forEach((t) => t.stop());
+
+        const duration = startTimeRef.current ? Date.now() - startTimeRef.current : 0;
+        startTimeRef.current = null;
+
+        if (duration < 1000) {
+          setStatus("idle");
+          resolve("");
+          return;
+        }
 
         setStatus("transcribing");
         try {

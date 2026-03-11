@@ -201,38 +201,40 @@ export function HomeStats() {
     <div className="w-full max-w-3xl mx-auto space-y-2">
 
       {/* ── Month picker + category pills — one unified control row ── */}
-      <div className="flex w-full items-center gap-1.5">
-        {/* "All" pill */}
-        <button
-          onClick={() => setSelectedCategory(null)}
-          className={cn(
-            "flex flex-1 cursor-pointer items-center justify-center rounded-full border px-2 py-1 text-[11px] font-semibold transition-colors",
-            selectedCategory === null
-              ? "border-foreground/20 bg-foreground text-background"
-              : "border-border/60 bg-muted/20 text-muted-foreground hover:bg-muted/40 hover:text-foreground",
-          )}
-        >
-          All
-        </button>
+      {usedCategories.length > 2 && (
+        <div className="flex w-full flex-wrap gap-1.5">
+          {/* "All" pill */}
+          <button
+            onClick={() => setSelectedCategory(null)}
+            className={cn(
+              "cursor-pointer items-center justify-center whitespace-nowrap rounded-full border px-3 py-1.5 text-[11px] font-semibold transition-colors",
+              selectedCategory === null
+                ? "border-foreground/20 bg-foreground text-background"
+                : "border-border/60 bg-muted/20 text-muted-foreground hover:bg-muted/40 hover:text-foreground",
+            )}
+          >
+            All
+          </button>
 
-        {usedCategories.map((cat) => {
-          const isActive = selectedCategory === cat;
-          return (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(isActive ? null : cat)}
-              className={cn(
-                "flex flex-1 cursor-pointer items-center justify-center rounded-full border px-2 py-1 text-[11px] font-semibold transition-colors",
-                isActive
-                  ? CATEGORY_META[cat].badgeClassName
-                  : "border-border/60 bg-muted/20 text-muted-foreground hover:bg-muted/40 hover:text-foreground",
-              )}
-            >
-              {CATEGORY_LABELS[cat]}
-            </button>
-          );
-        })}
-      </div>
+          {usedCategories.map((cat) => {
+            const isActive = selectedCategory === cat;
+            return (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(isActive ? null : cat)}
+                className={cn(
+                  "cursor-pointer items-center justify-center whitespace-nowrap rounded-full border px-3 py-1.5 text-[11px] font-semibold transition-colors",
+                  isActive
+                    ? CATEGORY_META[cat].badgeClassName
+                    : "border-border/60 bg-muted/20 text-muted-foreground hover:bg-muted/40 hover:text-foreground",
+                )}
+              >
+                {CATEGORY_LABELS[cat]}
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {/* ── Transactions card ── */}
       <div className="overflow-hidden rounded-xl border border-border/70 bg-card shadow-sm">

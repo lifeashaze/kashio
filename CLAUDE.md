@@ -32,7 +32,94 @@ npm run lint             # Run ESLint
 
 **Important**: Always use `bun` for package management (install/add/remove), not `npm install`. This avoids peer dependency conflicts and ensures consistency.
 
+## Feature Overview
+
+Kashio has these main features:
+- **Natural language expense parsing** - Type expenses in plain English, AI extracts amount/category/date
+- **Voice input** - Record expenses by speaking (transcribed via Groq Whisper)
+- **AI Chat assistant** - Ask questions about spending ("how much did I spend on food in January?")
+- **Analytics dashboard** - Charts: spending over time, category pie, budget vs actual, day-of-week breakdown
+- **Budget tracking** - Monthly budget progress bar with remaining, days left, top category (excl. bills)
+- **Onboarding wizard** - 2-step setup: budget/currency, then category selection
+- **User preferences** - Monthly budget, currency, timezone, language, date format, enabled categories
+- **Expense management** - Create, edit, delete with confirmation, filter by month and category
+
 ## Architecture
+
+### App Routes (Pages)
+
+```
+app/
+├── page.tsx                       # Landing page (public, server component)
+├── home/page.tsx                  # Main dashboard (protected)
+├── analytics/page.tsx             # Analytics dashboard with charts (protected)
+├── chat/page.tsx                  # AI chat interface (protected)
+├── profile/page.tsx               # User profile and preferences (protected)
+├── onboarding/page.tsx            # Onboarding wizard (redirects to /home after)
+├── login/page.tsx                 # Login page (public)
+├── signup/page.tsx                # Signup page (public)
+└── changelog/page.tsx             # Public changelog
+```
+
+### API Routes
+
+```
+app/api/
+├── auth/[...all]/route.ts         # Better Auth catchall (sign up, sign in, OAuth, etc.)
+├── clear-session/route.ts         # Clear session + redirect to login
+├── expenses/route.ts              # GET (user expenses) / POST (create expense)
+├── expenses/[id]/route.ts         # PUT (update) / DELETE (delete expense)
+├── parse-expense/route.ts         # POST: AI NLP expense parser (Groq, Kimi-k2)
+├── chat/route.ts                  # POST: streaming AI chat with expense context
+├── transcribe/route.ts            # POST: audio → text (Groq Whisper)
+├── user/preferences/route.ts      # GET / POST user preferences
+├── user/onboarding/route.ts       # PATCH onboarding status
+└── changelog/route.ts             # GET / POST changelog entries
+```
+
+### Component Structure
+
+**Landing** (`components/landing/`):
+- `nav.tsx` - Sticky nav with auth links
+- `hero.tsx` - Hero section with interactive demo
+- `product-showcase.tsx` - 3-step visual walkthrough
+- `how-it-works.tsx` - Step cards with examples
+- `features.tsx` - Feature grid: voice, AI chat, analytics, budget
+- `cta.tsx` - Call-to-action
+- `expense-input-demo.tsx` - Interactive expense input demo
+
+**Home/Dashboard** (`components/home/`):
+- `home-content.tsx` - Main dashboard layout
+- `home-header.tsx` - Welcome message
+- `home-input.tsx` - Natural language + voice expense input
+- `home-nav.tsx` - Bottom nav bar (home, analytics, chat, profile)
+- `home-stats.tsx` - Expense table with month/category filtering + edit/delete
+- `monthly-budget-metrics.tsx` - Budget progress: remaining, days left, top category (excl. bills)
+- `expense-confirmation-dialog.tsx` - Review dialog for low-confidence AI parses
+- `stats/expense-row.tsx` - Desktop + mobile expense row
+- `stats/expense-edit-dialog.tsx` - Inline edit dialog
+- `stats/expense-row-actions.tsx` - Edit/delete buttons with confirm timeout
+
+**Analytics** (`components/analytics/`):
+- `analytics-dashboard.tsx` - Date range filter + all charts
+- `spending-chart.tsx` - Line/bar chart over time
+- `spending-stats.tsx` - Key metrics (total, avg, median, largest, etc.)
+- `spending-vs-budget.tsx` - Budget comparison chart
+- `category-breakdown.tsx` - Pie chart by category
+- `day-of-week-chart.tsx` - Spending pattern by weekday
+- `top-categories.tsx` - Ranked category list
+
+**Chat** (`components/chat/`):
+- `chat-interface.tsx` - Full chat UI with streaming, voice input, suggestion prompts
+
+**Profile** (`components/profile/`):
+- `profile-content.tsx` - Layout
+- `sections/` - Account info, settings, security, integrations, data privacy
+
+**Onboarding** (`components/onboarding/`):
+- `onboarding-wizard.tsx` - 2-step setup wizard
+- `steps/budget-step.tsx` - Monthly budget + currency
+- `steps/categories-step.tsx` - Category selection
 
 ### Authentication Flow
 
@@ -61,9 +148,11 @@ The app uses Better Auth with a centralized authentication architecture:
 
 **Schema Organization**:
 - `lib/schema.ts` - Main schema file that re-exports auth schema and defines app models
-  - `changelog` table - Changelog entries with date and content
-  - `expenses` table - User expenses with amount, description, category, date, and rawInput
+  - `expenses` table - User expenses with amount, description, category, date, rawInput
+  - `userPreferences` table - Per-user: monthlyBudget, currency, timezone, language, dateFormat, enabledCategories
+  - `changelog` table - Release notes/updates
 - `lib/auth-schema.ts` - Better Auth tables (user, session, account, verification)
+  - `user` table also carries `onboardingCompleted` and `onboardingStep` columns
 - Drizzle config (`drizzle.config.ts`) points to `lib/schema.ts` for migrations
 
 **Migration Workflow**:
@@ -72,40 +161,10 @@ The app uses Better Auth with a centralized authentication architecture:
 3. Run `npm run db:migrate` to apply to database
 4. Use `npm run db:push` for development-only schema sync (skips migration files)
 
-### Component Structure
-
-**UI Components** (`components/ui/`):
-- Headless UI components styled with Tailwind CSS
-- Use Class-Variance-Authority (CVA) for variant-based styling
-- Import pattern: `import { Button } from "@/components/ui/button"`
-
-**Feature Components**:
-- `components/auth/` - Authentication forms
-- `components/home/` - Dashboard and expense input interface
-  - `home-input.tsx` - Natural language expense input with two-tier validation
-  - `expense-confirmation-dialog.tsx` - Review/edit dialog for low-confidence parses
-- `components/landing/` - Landing page sections (hero, features, CTA, footer)
-
 **Client vs Server Components**:
 - Components with `"use client"` directive are client components (interactive)
 - Default components are server components (data fetching, static)
 - Pages in `app/` default to server components unless marked with `"use client"`
-
-### App Router Structure
-
-```
-app/
-├── api/
-│   ├── auth/[...all]/route.ts    # Auth API catchall (handles all Better Auth endpoints)
-│   ├── changelog/route.ts         # Changelog CRUD API
-│   ├── expenses/route.ts          # Expense CRUD API (GET: fetch user expenses, POST: create expense)
-│   └── parse-expense/route.ts     # AI-powered natural language expense parser
-├── page.tsx                       # Landing page (public, server component)
-├── home/page.tsx                  # Dashboard (protected, client component)
-├── login/page.tsx                 # Login page (public, client component)
-├── signup/page.tsx                # Signup page (public, client component)
-└── changelog/page.tsx             # Changelog display (public, server component)
-```
 
 **API Route Patterns**:
 - Export named functions: `GET`, `POST`, `PUT`, `DELETE`

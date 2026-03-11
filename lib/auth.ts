@@ -38,11 +38,11 @@ export const auth = betterAuth({
             },
             "/sign-in/email": {
                 window: 60,
-                max: 5,
+                max: 10,
             },
             "/sign-up/email": {
                 window: 300,
-                max: 3,
+                max: 100,
             },
         },
     },

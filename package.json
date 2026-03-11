@@ -12,7 +12,8 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:reset": "bun scripts/reset-db.ts",
-    "seed:demo": "bun scripts/seed-demo.ts"
+    "seed:demo": "bun scripts/seed-demo.ts",
+    "reset:demo": "bun scripts/reset-demo.ts"
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.18",

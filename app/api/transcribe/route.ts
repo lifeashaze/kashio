@@ -16,6 +16,26 @@ export async function POST(req: Request) {
       return badRequest("No audio file provided");
     }
 
+    const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB (Groq limit)
+    if (audio.size > MAX_FILE_SIZE) {
+      return badRequest("File too large (max 25MB)");
+    }
+
+    const ALLOWED_TYPES = [
+      "audio/webm",
+      "audio/mpeg",
+      "audio/mp3",
+      "audio/wav",
+      "audio/ogg",
+      "audio/flac",
+      "audio/mp4",
+      "audio/m4a",
+      "audio/x-m4a",
+    ];
+    if (audio.type && !ALLOWED_TYPES.includes(audio.type)) {
+      return badRequest("Invalid audio format");
+    }
+
     const transcription = await groq.audio.transcriptions.create({
       file: audio,
       model: "whisper-large-v3-turbo",

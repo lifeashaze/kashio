@@ -2,20 +2,39 @@ import Link from "next/link";
 
 export function Footer() {
   return (
-    <footer className="relative overflow-hidden border-t border-border/40 px-4 sm:px-6 py-8 sm:py-12" role="contentinfo">
-      <div className="relative z-10 mx-auto max-w-7xl">
-        <div className="flex flex-col items-center justify-between gap-4 sm:gap-6 md:flex-row">
-          <span className="font-heading text-base sm:text-lg font-bold tracking-tight text-foreground">
-            kashio
-          </span>
+    <footer
+      className="border-t border-border/40 px-4 sm:px-6 py-7"
+      role="contentinfo"
+    >
+      <div className="mx-auto max-w-7xl flex flex-col items-center justify-between gap-3 sm:flex-row">
+        <span className="font-heading text-base font-bold tracking-tight text-foreground">
+          kashio
+        </span>
 
+        <div className="flex items-center gap-5 text-xs text-muted-foreground">
           <Link
             href="/changelog"
-            className="text-xs sm:text-sm text-muted-foreground transition-colors hover:text-foreground"
+            className="transition-colors hover:text-foreground"
           >
             Changelog
           </Link>
+          <Link
+            href="/login"
+            className="transition-colors hover:text-foreground"
+          >
+            Sign in
+          </Link>
+          <Link
+            href="/signup"
+            className="transition-colors hover:text-foreground"
+          >
+            Get started
+          </Link>
         </div>
+
+        <p className="text-[11px] text-muted-foreground/50">
+          © {new Date().getFullYear()} kashio
+        </p>
       </div>
     </footer>
   );

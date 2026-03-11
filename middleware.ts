@@ -16,7 +16,10 @@ export async function middleware(request: NextRequest) {
   const isAuthRoute = request.nextUrl.pathname.startsWith("/login") ||
                       request.nextUrl.pathname.startsWith("/signup");
   const isProtectedRoute = request.nextUrl.pathname.startsWith("/home") ||
-                           request.nextUrl.pathname.startsWith("/profile");
+                           request.nextUrl.pathname.startsWith("/profile") ||
+                           request.nextUrl.pathname.startsWith("/analytics") ||
+                           request.nextUrl.pathname.startsWith("/chat") ||
+                           request.nextUrl.pathname.startsWith("/onboarding");
 
   // Redirect authenticated users away from login/signup to home
   if (session && isAuthRoute) {

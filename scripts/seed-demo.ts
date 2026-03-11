@@ -153,8 +153,8 @@ const DINNER_SPOTS = [
 const TRANSPORT_OPTIONS = [
   { name: "Uber - Ride", min: 12, max: 38 },
   { name: "Lyft - Ride", min: 11, max: 35 },
-  { name: "BART - Commute", min: 4, max: 9 },
-  { name: "BART - Commute", min: 4, max: 9 }, // higher weight for BART
+  { name: "MBTA - Commute", min: 2, max: 6 },
+  { name: "MBTA - Commute", min: 2, max: 6 }, // higher weight for MBTA
 ];
 
 const SHOPPING_ITEMS = [
@@ -205,24 +205,24 @@ function generateMonth(
   }
 
   // ── FIXED BILLS ─────────────────────────────────────────────────────────
-  if (startDay <= 5) {
+  if (startDay <= 5 && endDay >= 5) {
     result.push(entry(89.99, "Comcast - Internet", "bills", year, month, 5, "comcast internet $89.99"));
   }
-  if (startDay <= 7) {
+  if (startDay <= 7 && endDay >= 7) {
     result.push(entry(65, "Verizon - Phone Bill", "bills", year, month, 7, "verizon phone bill $65"));
   }
-  if (startDay <= 10) {
+  if (startDay <= 10 && endDay >= 10) {
     result.push(entry(17.99, "Netflix", "bills", year, month, 10, "netflix $17.99"));
   }
-  if (startDay <= 12) {
+  if (startDay <= 12 && endDay >= 12) {
     result.push(entry(11.99, "Spotify", "bills", year, month, 12, "spotify $11.99"));
   }
-  if (startDay <= 14) {
+  if (startDay <= 14 && endDay >= 14) {
     result.push(entry(2.99, "iCloud - Storage Plan", "bills", year, month, 14, "icloud storage $2.99"));
   }
 
   // Electric: higher in winter (Dec/Jan/Feb) and summer (Jul/Aug), lower otherwise
-  if (startDay <= 20) {
+  if (startDay <= 20 && endDay >= 20) {
     const isWinter = month === 12 || month === 1 || month === 2;
     const base = isWinter ? 145 : 105;
     const electric = rng.money(base, base + 50);
@@ -230,7 +230,7 @@ function generateMonth(
   }
 
   // ── GYM ─────────────────────────────────────────────────────────────────
-  if (startDay <= 15) {
+  if (startDay <= 15 && endDay >= 15) {
     result.push(entry(85, "Equinox - Gym Membership", "health", year, month, 15, "equinox gym $85"));
   }
 

@@ -1,12 +1,5 @@
 import type { Metadata } from "next";
-import {
-  Nav,
-  Hero,
-  ProductShowcase,
-  HowItWorks,
-  CTA,
-  Footer,
-} from "@/components/landing";
+import { LandingPage } from "@/components/landing/landing-page";
 import { SessionProvider } from "@/lib/session-context";
 
 export const metadata: Metadata = {
@@ -19,19 +12,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function LandingPage() {
+export default function Page() {
   return (
     <SessionProvider>
-      <div className="relative min-h-screen bg-background">
-        <Nav />
-        <main id="main-content">
-          <Hero />
-          <ProductShowcase />
-          <HowItWorks />
-          <CTA />
-        </main>
-        <Footer />
-      </div>
+      <LandingPage />
     </SessionProvider>
   );
 }
