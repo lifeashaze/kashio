@@ -11,7 +11,7 @@ export default async function ProfilePage() {
   const session = await getSession();
 
   if (!session) {
-    redirect("/api/clear-session");
+    redirect("/login");
   }
 
   const queryClient = new QueryClient();
