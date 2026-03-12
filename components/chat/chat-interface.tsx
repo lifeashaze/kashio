@@ -267,6 +267,7 @@ export function ChatInterface({ userName }: ChatInterfaceProps) {
               onKeyDown={handleKeyDown}
               placeholder="Ask about your expenses…"
               rows={1}
+              autoComplete="off"
               className="flex-1 resize-none rounded-2xl border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary/40 focus:outline-none focus:ring-2 focus:ring-ring/40 transition-colors"
               style={{ minHeight: "48px", maxHeight: "140px" }}
               onInput={(e) => {
