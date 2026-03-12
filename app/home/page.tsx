@@ -2,7 +2,6 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { HomeNav, HomeContent } from "@/components/home";
-// import { OnboardingWizard } from "@/components/onboarding/onboarding-wizard";
 
 export default async function HomePage() {
   const session = await auth.api.getSession({
@@ -13,13 +12,10 @@ export default async function HomePage() {
     redirect("/api/clear-session");
   }
 
-  // const showOnboarding = !session.user.onboardingCompleted;
-
   return (
     <div className="min-h-screen bg-background">
       <HomeNav user={session.user} />
       <HomeContent user={session.user} />
-      {/* {showOnboarding && <OnboardingWizard />} */}
     </div>
   );
 }
