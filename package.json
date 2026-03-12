@@ -13,7 +13,8 @@
     "db:studio": "drizzle-kit studio",
     "db:reset": "bun scripts/reset-db.ts",
     "seed:demo": "bun scripts/seed-demo.ts",
-    "reset:demo": "bun scripts/reset-demo.ts"
+    "reset:demo": "bun scripts/reset-demo.ts",
+    "telegram:webhook:set": "tsx scripts/set-telegram-webhook.ts"
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.18",

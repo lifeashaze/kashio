@@ -33,6 +33,9 @@ Changelog (/changelog)   - public
 /api/expenses            - GET (list), POST (create)
 /api/expenses/[id]       - PUT, DELETE
 /api/chat                - Streaming chat with expense context
+/api/integrations/telegram - GET (status), DELETE (disconnect)
+/api/integrations/telegram/link - POST (create deep-link token)
+/api/integrations/telegram/webhook - Telegram webhook
 /api/changelog           - Changelog CRUD
 /api/user/preferences    - User settings
 /api/user/onboarding     - Onboarding state
@@ -63,6 +66,36 @@ Changelog (/changelog)   - public
 - `dateFormat` text (default: MM/DD/YYYY)
 - `enabledCategories` text[]
 - `createdAt`, `updatedAt` timestamps
+
+**`telegramConnections`**
+- `id` UUID primary key
+- `userId` text unique (references auth user)
+- `telegramUserId` text unique
+- `telegramChatId` text unique
+- `telegramUsername`, `telegramFirstName`, `telegramLastName`
+- `linkedAt`, `lastSeenAt`, `createdAt`, `updatedAt`
+
+**`telegramLinkTokens`**
+- `id` UUID primary key
+- `userId` text (references auth user)
+- `tokenHash` text unique
+- `expiresAt`, `usedAt`, `createdAt`
+
+**`telegramPendingConfirmations`**
+- `id` UUID primary key
+- `userId` text (references auth user)
+- `telegramChatId` text
+- `telegramMessageId` integer
+- `rawInput` text
+- `parsedExpenseJson` jsonb
+- `editField`, `status`, `expiresAt`, `createdAt`, `updatedAt`
+
+**`telegramWebhookEvents`**
+- `id` UUID primary key
+- `telegramUpdateId` text unique
+- `updateType` text
+- `payloadJson` jsonb
+- `status`, `errorMessage`, `processedAt`, `createdAt`
 
 **`changelog`**
 - `id` UUID primary key
@@ -117,6 +150,14 @@ Centralized in `lib/prompts/expense-parser.ts`.
 ### Voice Input
 
 Browser `MediaRecorder` captures `audio/webm` → POST to `/api/transcribe` → Groq Whisper returns text → fed into expense input or chat.
+
+### Telegram Bot
+
+- Telegram private chat messages hit `/api/integrations/telegram/webhook`
+- Secure account linking starts from Profile via Telegram deep link
+- Expense parses reuse the same shared parser service as the web app
+- Low-confidence expenses use inline Telegram confirmation/edit actions
+- Non-expense questions route to the same expense assistant context
 
 ---
 

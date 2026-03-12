@@ -1,11 +1,8 @@
-import { db } from "@/lib/db";
-import { expenses } from "@/lib/schema";
 import {
   success,
   notFound,
   noContent,
 } from "@/lib/api/responses";
-import { eq, and } from "drizzle-orm";
 import {
   parseRequestBody,
   parseRouteParam,
@@ -16,20 +13,15 @@ import {
   expenseIdSchema,
   updateExpenseSchema,
 } from "@/lib/expenses/schemas";
+import {
+  deleteExpenseForUser,
+  findOwnedExpense,
+  updateExpenseForUser,
+} from "@/lib/services/expense-write";
 
 type RouteParams = {
   params: Promise<{ id: string }>;
 };
-
-async function findOwnedExpense(id: string, userId: string) {
-  const [expense] = await db
-    .select()
-    .from(expenses)
-    .where(and(eq(expenses.id, id), eq(expenses.userId, userId)))
-    .limit(1);
-
-  return expense;
-}
 
 export async function PUT(
   req: Request,
@@ -51,23 +43,13 @@ export async function PUT(
       return notFound("Expense not found");
     }
 
-    const updated = await db
-      .update(expenses)
-      .set({
-        amount: String(body.data.amount),
-        description: body.data.description,
-        category: body.data.category,
-        date: body.data.date,
-      })
-      .where(
-        and(
-          eq(expenses.id, parsedId.data),
-          eq(expenses.userId, auth.data.user.id)
-        )
-      )
-      .returning();
+    const updated = await updateExpenseForUser(
+      auth.data.user.id,
+      parsedId.data,
+      body.data
+    );
 
-    return success(updated[0]);
+    return success(updated);
   });
 }
 
@@ -89,14 +71,7 @@ export async function DELETE(
       return notFound("Expense not found");
     }
 
-    await db
-      .delete(expenses)
-      .where(
-        and(
-          eq(expenses.id, parsedId.data),
-          eq(expenses.userId, auth.data.user.id)
-        )
-      );
+    await deleteExpenseForUser(auth.data.user.id, parsedId.data);
 
     return noContent();
   });

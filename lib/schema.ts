@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, uuid, numeric, date } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, uuid, numeric, date, jsonb, integer } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { user } from "@/auth-schema";
 
@@ -51,3 +51,71 @@ export const userPreferences = pgTable("user_preferences", {
 export type UserPreferences = typeof userPreferences.$inferSelect;
 export type NewUserPreferences = typeof userPreferences.$inferInsert;
 
+export const telegramConnections = pgTable("telegram_connections", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id")
+    .notNull()
+    .unique()
+    .references(() => user.id, { onDelete: "cascade" }),
+  telegramUserId: text("telegram_user_id").notNull().unique(),
+  telegramChatId: text("telegram_chat_id").notNull().unique(),
+  telegramUsername: text("telegram_username"),
+  telegramFirstName: text("telegram_first_name"),
+  telegramLastName: text("telegram_last_name"),
+  linkedAt: timestamp("linked_at").notNull().defaultNow(),
+  lastSeenAt: timestamp("last_seen_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export type TelegramConnection = typeof telegramConnections.$inferSelect;
+export type NewTelegramConnection = typeof telegramConnections.$inferInsert;
+
+export const telegramLinkTokens = pgTable("telegram_link_tokens", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  tokenHash: text("token_hash").notNull().unique(),
+  expiresAt: timestamp("expires_at").notNull(),
+  usedAt: timestamp("used_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export type TelegramLinkToken = typeof telegramLinkTokens.$inferSelect;
+export type NewTelegramLinkToken = typeof telegramLinkTokens.$inferInsert;
+
+export const telegramPendingConfirmations = pgTable("telegram_pending_confirmations", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  telegramChatId: text("telegram_chat_id").notNull(),
+  telegramMessageId: integer("telegram_message_id"),
+  rawInput: text("raw_input").notNull(),
+  parsedExpenseJson: jsonb("parsed_expense_json").notNull(),
+  editField: text("edit_field"),
+  status: text("status").notNull().default("pending"),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export type TelegramPendingConfirmation =
+  typeof telegramPendingConfirmations.$inferSelect;
+export type NewTelegramPendingConfirmation =
+  typeof telegramPendingConfirmations.$inferInsert;
+
+export const telegramWebhookEvents = pgTable("telegram_webhook_events", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  telegramUpdateId: text("telegram_update_id").notNull().unique(),
+  updateType: text("update_type").notNull(),
+  payloadJson: jsonb("payload_json").notNull(),
+  status: text("status").notNull(),
+  errorMessage: text("error_message"),
+  processedAt: timestamp("processed_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export type TelegramWebhookEvent = typeof telegramWebhookEvents.$inferSelect;
+export type NewTelegramWebhookEvent = typeof telegramWebhookEvents.$inferInsert;
