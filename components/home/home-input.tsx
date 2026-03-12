@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useSyncExternalStore } from "react";
 import { Plus, Check, AlertCircle, Loader2, Mic, MicOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -22,9 +22,13 @@ export function HomeInput() {
   const [input, setInput] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const voice = useVoiceInput();
-  const [supportsMediaRecorder] = useState(
-    () => typeof window !== "undefined" && typeof MediaRecorder !== "undefined"
+  const isClient = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
   );
+  const supportsMediaRecorder =
+    isClient && typeof MediaRecorder !== "undefined";
   const [status, setStatus] = useState<
     "idle" | "parsing" | "saving" | "saved" | "error"
   >("idle");

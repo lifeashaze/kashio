@@ -1,5 +1,4 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { ProfileSection } from "@/components/profile/sections/profile-section";
 import { getUserInitials } from "@/lib/user";
 import type { ProfileUser } from "@/components/profile/types";
@@ -13,8 +12,8 @@ export function AccountInformationSection({
 }: AccountInformationSectionProps) {
   return (
     <ProfileSection
-      title="Account Information"
-      description="Your basic account details"
+      title="Account"
+      description="Your signed-in account details are shown here for reference."
     >
       <Card>
         <CardContent className="p-4 sm:p-6">
@@ -23,12 +22,14 @@ export function AccountInformationSection({
               {getUserInitials(user.name)}
             </div>
             <div className="min-w-0 flex-1">
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+                Read only
+              </p>
               <p className="truncate font-medium text-foreground">{user.name}</p>
-              <p className="truncate text-sm text-muted-foreground">{user.email}</p>
+              <p className="truncate text-sm text-muted-foreground">
+                {user.email}
+              </p>
             </div>
-            <Button variant="outline" size="sm" className="w-full sm:w-auto">
-              Edit Profile
-            </Button>
           </div>
         </CardContent>
       </Card>

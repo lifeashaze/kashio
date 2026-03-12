@@ -26,24 +26,4 @@ export const auth = betterAuth({
     trustedOrigins: isDevelopment
         ? ["*"]
         : [process.env.BETTER_AUTH_URL!],
-    rateLimit: {
-        enabled: true,
-        window: 60,
-        max: 20,
-        storage: "memory",
-        customRules: {
-            "/get-session": {
-                window: 60,
-                max: 100,
-            },
-            "/sign-in/email": {
-                window: 60,
-                max: 10,
-            },
-            "/sign-up/email": {
-                window: 300,
-                max: 100,
-            },
-        },
-    },
 });

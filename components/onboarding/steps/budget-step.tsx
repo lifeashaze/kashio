@@ -9,8 +9,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { TrendingUp, DollarSign } from "lucide-react";
 import { DEFAULT_MONTHLY_BUDGET } from "@/lib/constants/budget";
+import { CURRENCIES } from "@/lib/constants/preferences";
 
 interface BudgetStepProps {
   monthlyBudget: number;
@@ -18,17 +18,6 @@ interface BudgetStepProps {
   onMonthlyBudgetChange: (value: number) => void;
   onCurrencyChange: (value: string) => void;
 }
-
-const CURRENCIES = [
-  { code: "USD", name: "US Dollar", symbol: "$" },
-  { code: "EUR", name: "Euro", symbol: "€" },
-  { code: "GBP", name: "British Pound", symbol: "£" },
-  { code: "CAD", name: "Canadian Dollar", symbol: "CA$" },
-  { code: "AUD", name: "Australian Dollar", symbol: "A$" },
-  { code: "JPY", name: "Japanese Yen", symbol: "¥" },
-  { code: "CNY", name: "Chinese Yuan", symbol: "¥" },
-  { code: "INR", name: "Indian Rupee", symbol: "₹" },
-];
 
 export function BudgetStep({
   monthlyBudget,

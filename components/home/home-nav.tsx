@@ -97,7 +97,7 @@ export function HomeNav({ user }: HomeNavProps) {
                       onClick={() => setShowMenu(false)}
                     >
                       <User className="size-4" />
-                      Profile
+                      Settings
                     </Link>
                     <button
                       className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground disabled:opacity-50"
