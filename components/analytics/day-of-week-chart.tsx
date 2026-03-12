@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useEffect } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
-import type { Expense } from "@/lib/schema";
+import type { ClientExpense } from "@/lib/types/expense";
 
 interface TooltipProps {
   active?: boolean;
@@ -25,7 +25,7 @@ function CustomTooltip({ active, payload, label }: TooltipProps) {
 }
 
 interface DayOfWeekChartProps {
-  expenses: Expense[];
+  expenses: ClientExpense[];
 }
 
 export function DayOfWeekChart({ expenses }: DayOfWeekChartProps) {

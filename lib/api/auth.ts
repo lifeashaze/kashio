@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { unauthorized } from "@/lib/api/responses";
@@ -27,11 +28,14 @@ export type SessionResult =
   | { success: false; response: Response };
 
 
-export async function requireAuth(): Promise<SessionResult> {
-  const session = await auth.api.getSession({
+export const getSession = cache(async (): Promise<AuthSession | null> => {
+  return auth.api.getSession({
     headers: await headers(),
   });
+});
 
+export async function requireAuth(): Promise<SessionResult> {
+  const session = await getSession();
   if (!session) {
     return {
       success: false,
@@ -40,10 +44,4 @@ export async function requireAuth(): Promise<SessionResult> {
   }
 
   return { success: true, session };
-}
-
-export async function getSession(): Promise<AuthSession | null> {
-  return auth.api.getSession({
-    headers: await headers(),
-  });
 }

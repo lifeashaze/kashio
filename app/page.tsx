@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { LandingPage } from "@/components/landing/landing-page";
-import { SessionProvider } from "@/lib/session-context";
+import { getSession } from "@/lib/api/auth";
 
 export const metadata: Metadata = {
   title: "kashio - Natural language expense tracking",
@@ -12,10 +12,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function Page() {
+export default async function Page() {
+  const session = await getSession();
+
   return (
-    <SessionProvider>
-      <LandingPage />
-    </SessionProvider>
+    <LandingPage hasSession={Boolean(session)} />
   );
 }

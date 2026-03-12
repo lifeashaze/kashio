@@ -62,12 +62,17 @@ export async function streamExpenseAssistantResponse({
   userId: string;
   messages: UIMessage[];
 }) {
-  const system = await getAssistantSystemPrompt(userId);
+  const systemPromise = getAssistantSystemPrompt(userId);
+  const modelMessagesPromise = convertToModelMessages(messages);
+  const [system, modelMessages] = await Promise.all([
+    systemPromise,
+    modelMessagesPromise,
+  ]);
 
   return streamText({
     model: groq("moonshotai/kimi-k2-instruct-0905"),
     system,
-    messages: await convertToModelMessages(messages),
+    messages: modelMessages,
   });
 }
 

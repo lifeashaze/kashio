@@ -1,11 +1,9 @@
 interface HomeHeaderProps {
-  user: {
-    name: string;
-  };
+  name: string;
 }
 
-export function HomeHeader({ user }: HomeHeaderProps) {
-  const firstName = user.name.split(" ")[0];
+export function HomeHeader({ name }: HomeHeaderProps) {
+  const firstName = name.split(" ")[0];
 
   return (
     <div className="space-y-2 text-center">

@@ -1,4 +1,4 @@
-import type { Expense } from "@/lib/schema";
+import type { ClientExpense } from "@/lib/types/expense";
 import type { ExpenseCategory } from "@/lib/constants/categories";
 import { dateOnlyStringToDate, formatRelativeDateLabel } from "@/lib/date";
 
@@ -30,7 +30,7 @@ export function parseExpenseCategory(category: string): ExpenseCategory {
   return category as ExpenseCategory;
 }
 
-export function buildEditFormState(expense: Expense) {
+export function buildEditFormState(expense: ClientExpense) {
   return {
     amount: Number(expense.amount).toFixed(2),
     description: expense.description,

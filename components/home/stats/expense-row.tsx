@@ -13,11 +13,11 @@ import {
   ShoppingCart,
   UtensilsCrossed,
 } from "lucide-react";
-import type { Expense } from "@/lib/schema";
 import {
   CATEGORY_LABELS,
   type ExpenseCategory,
 } from "@/lib/constants/categories";
+import type { ClientExpense } from "@/lib/types/expense";
 import { cn } from "@/lib/utils";
 import { ExpenseRowActions } from "@/components/home/stats/expense-row-actions";
 import {
@@ -27,7 +27,7 @@ import {
 } from "@/components/home/stats/helpers";
 
 type ExpenseRowProps = {
-  expense: Expense;
+  expense: ClientExpense;
   layout: "desktop" | "mobile";
   isPendingDelete: boolean;
   isDeletingCurrent: boolean;

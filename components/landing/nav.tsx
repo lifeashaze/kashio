@@ -1,12 +1,12 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import Link from "next/link";
-import { useSession } from "@/lib/session-context";
 
-export function Nav() {
-  const { session, isLoading } = useSession();
+type NavProps = {
+  hasSession: boolean;
+};
+
+export function Nav({ hasSession }: NavProps) {
 
   return (
     <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl" role="navigation" aria-label="Main navigation">
@@ -18,9 +18,9 @@ export function Nav() {
 
           <div className="flex items-center gap-2 sm:gap-3">
             <ThemeToggle />
-            {!isLoading && (
+            {
               <>
-                {session ? (
+                {hasSession ? (
                   <Button
                     size="sm"
                     className="bg-primary text-xs sm:text-sm font-medium shadow-lg shadow-primary/30 px-3 sm:px-4"
@@ -48,7 +48,7 @@ export function Nav() {
                   </>
                 )}
               </>
-            )}
+            }
           </div>
         </div>
       </div>

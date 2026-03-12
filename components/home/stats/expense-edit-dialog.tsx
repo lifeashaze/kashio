@@ -2,14 +2,13 @@
 
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
-import type { Expense } from "@/lib/schema";
 import {
   EXPENSE_CATEGORIES,
   CATEGORY_LABELS,
   type ExpenseCategory,
 } from "@/lib/constants/categories";
 import { dateToDateOnlyString } from "@/lib/date";
-import type { UpdateExpensePayload } from "@/lib/types/expense";
+import type { ClientExpense, UpdateExpensePayload } from "@/lib/types/expense";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -31,7 +30,7 @@ import { DatePicker } from "@/components/ui/date-picker";
 import { buildEditFormState } from "@/components/home/stats/helpers";
 
 type ExpenseEditDialogProps = {
-  expense: Expense | null;
+  expense: ClientExpense | null;
   isSaving: boolean;
   onClose: () => void;
   onSave: (payload: UpdateExpensePayload) => Promise<void>;

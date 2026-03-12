@@ -1,12 +1,12 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { useSession } from "@/lib/session-context";
 
-export function CTA() {
-  const { session, isLoading } = useSession();
+type CTAProps = {
+  hasSession: boolean;
+};
+
+export function CTA({ hasSession }: CTAProps) {
 
   return (
     <section
@@ -23,41 +23,39 @@ export function CTA() {
           Free, open source, and requires nothing but a few words to get started.
         </p>
 
-        {!isLoading && (
-          <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-            {session ? (
+        <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+          {hasSession ? (
+            <Button
+              size="lg"
+              className="h-12 w-full px-9 text-sm font-semibold shadow-lg shadow-primary/20 sm:w-auto"
+              asChild
+            >
+              <Link href="/home">
+                Go to dashboard <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+          ) : (
+            <>
               <Button
                 size="lg"
                 className="h-12 w-full px-9 text-sm font-semibold shadow-lg shadow-primary/20 sm:w-auto"
                 asChild
               >
-                <Link href="/home">
-                  Go to dashboard <ArrowRight className="ml-2 h-4 w-4" />
+                <Link href="/signup">
+                  Create free account <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
-            ) : (
-              <>
-                <Button
-                  size="lg"
-                  className="h-12 w-full px-9 text-sm font-semibold shadow-lg shadow-primary/20 sm:w-auto"
-                  asChild
-                >
-                  <Link href="/signup">
-                    Create free account <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-                <Button
-                  size="lg"
-                  variant="ghost"
-                  className="h-12 w-full px-9 text-sm font-medium text-muted-foreground hover:text-foreground sm:w-auto"
-                  asChild
-                >
-                  <Link href="/login">Sign in</Link>
-                </Button>
-              </>
-            )}
-          </div>
-        )}
+              <Button
+                size="lg"
+                variant="ghost"
+                className="h-12 w-full px-9 text-sm font-medium text-muted-foreground hover:text-foreground sm:w-auto"
+                asChild
+              >
+                <Link href="/login">Sign in</Link>
+              </Button>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Glow */}

@@ -12,10 +12,13 @@ import {
 
 export async function POST(req: Request) {
   return withServerErrorBoundary("create expense", async () => {
-    const auth = await requireRouteAuth();
+    const authPromise = requireRouteAuth();
+    const bodyPromise = parseRequestBody(req, createExpenseSchema);
+
+    const auth = await authPromise;
     if (!auth.ok) return auth.response;
 
-    const body = await parseRequestBody(req, createExpenseSchema);
+    const body = await bodyPromise;
     if (!body.ok) return body.response;
 
     const result = await createExpenseForUser(auth.data.user.id, body.data);

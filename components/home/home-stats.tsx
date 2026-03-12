@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, ReceiptText } from "lucide-react";
-import type { Expense } from "@/lib/schema";
 import {
   useDeleteExpense,
   useExpenses,
@@ -21,6 +20,7 @@ import {
   type ExpenseCategory,
 } from "@/lib/constants/categories";
 import { cn } from "@/lib/utils";
+import type { ClientExpense } from "@/lib/types/expense";
 
 function EmptyState({ hasExpenses }: { hasExpenses: boolean }) {
   return (
@@ -49,7 +49,7 @@ export function HomeStats() {
   const currency = prefs?.currency || "USD";
 
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
-  const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
+  const [editingExpense, setEditingExpense] = useState<ClientExpense | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<ExpenseCategory | null>(null);
 
   const [selectedMonth, setSelectedMonth] = useState(() => {

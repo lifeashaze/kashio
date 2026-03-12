@@ -1,13 +1,10 @@
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
-import { HomeNav } from "@/components/home";
+import { HomeNav } from "@/components/home/home-nav";
 import { ChatInterface } from "@/components/chat/chat-interface";
+import { getSession } from "@/lib/api/auth";
 
 export default async function ChatPage() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  const session = await getSession();
 
   if (!session) {
     redirect("/api/clear-session");
@@ -15,7 +12,7 @@ export default async function ChatPage() {
 
   return (
     <div className="relative flex h-screen flex-col bg-background">
-      <HomeNav user={session.user} />
+      <HomeNav name={session.user.name} email={session.user.email} />
       <ChatInterface userName={session.user.name} />
     </div>
   );

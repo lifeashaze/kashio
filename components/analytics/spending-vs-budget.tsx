@@ -2,9 +2,9 @@
 
 import { useMemo, useState, useEffect } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
-import type { Expense } from "@/lib/schema";
 import { useUserPreferences } from "@/lib/hooks/use-user-preferences";
 import { DEFAULT_MONTHLY_BUDGET } from "@/lib/constants/budget";
+import type { ClientExpense } from "@/lib/types/expense";
 
 interface TooltipProps {
   active?: boolean;
@@ -30,7 +30,7 @@ function CustomTooltip({ active, payload, label }: TooltipProps) {
 }
 
 interface SpendingVsBudgetProps {
-  expenses: Expense[];
+  expenses: ClientExpense[];
   dateRangeType: "month" | "year" | "custom";
   selectedMonth: number;
   selectedYear: number;

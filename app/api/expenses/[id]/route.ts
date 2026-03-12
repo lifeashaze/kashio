@@ -28,14 +28,18 @@ export async function PUT(
   { params }: RouteParams
 ) {
   return withServerErrorBoundary("update expense", async () => {
-    const auth = await requireRouteAuth();
+    const authPromise = requireRouteAuth();
+    const paramsPromise = params;
+    const bodyPromise = parseRequestBody(req, updateExpenseSchema);
+
+    const auth = await authPromise;
     if (!auth.ok) return auth.response;
 
-    const resolvedParams = await params;
+    const resolvedParams = await paramsPromise;
     const parsedId = parseRouteParam(resolvedParams.id, expenseIdSchema);
     if (!parsedId.ok) return parsedId.response;
 
-    const body = await parseRequestBody(req, updateExpenseSchema);
+    const body = await bodyPromise;
     if (!body.ok) return body.response;
 
     const existingExpense = await findOwnedExpense(parsedId.data, auth.data.user.id);
@@ -59,10 +63,13 @@ export async function DELETE(
 ) {
   void req;
   return withServerErrorBoundary("delete expense", async () => {
-    const auth = await requireRouteAuth();
+    const authPromise = requireRouteAuth();
+    const paramsPromise = params;
+
+    const auth = await authPromise;
     if (!auth.ok) return auth.response;
 
-    const resolvedParams = await params;
+    const resolvedParams = await paramsPromise;
     const parsedId = parseRouteParam(resolvedParams.id, expenseIdSchema);
     if (!parsedId.ok) return parsedId.response;
 

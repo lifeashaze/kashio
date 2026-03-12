@@ -2,10 +2,10 @@
 
 import { useMemo, useState, useEffect } from "react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import type { Expense } from "@/lib/schema";
+import type { ClientExpense } from "@/lib/types/expense";
 
 interface SpendingChartProps {
-  expenses: Expense[];
+  expenses: ClientExpense[];
   dateRangeType: "month" | "year" | "custom";
   selectedMonth: number;
   selectedYear: number;
