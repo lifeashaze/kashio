@@ -75,6 +75,8 @@ DATABASE_URL="postgresql://postgres:postgres@localhost:5432/kashio"
 BETTER_AUTH_SECRET="replace-with-a-random-secret"
 BETTER_AUTH_URL="http://localhost:3000"
 GROQ_API_KEY="your-groq-api-key"
+RESEND_API_KEY=""
+AUTH_FROM_EMAIL="Kashio <auth@example.com>"
 
 # Optional OAuth
 GITHUB_CLIENT_ID=""
@@ -203,3 +205,10 @@ If you enable Telegram, make sure:
 - `APP_BASE_URL` points to the public app URL
 - the webhook is registered against that deployed URL
 - `TELEGRAM_WEBHOOK_SECRET` matches the value used by Telegram webhook requests
+
+If you use email/password auth in production, also configure:
+
+- `RESEND_API_KEY` for auth email delivery
+- `AUTH_FROM_EMAIL` for the sender shown on verification and reset emails
+
+In local development, Kashio falls back to logging auth email links to the server console when those email env vars are missing.

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -26,9 +27,19 @@ type FormSubmissionData = {
   name?: string;
 };
 
+type EnabledSocialProviders = {
+  github: boolean;
+  google: boolean;
+};
+
 interface AuthFormProps extends Omit<React.ComponentProps<"form">, "onSubmit"> {
+  enabledSocialProviders: EnabledSocialProviders;
   mode: AuthMode;
   onSubmit?: (data: FormSubmissionData) => void | Promise<void>;
+}
+
+function getClientCallbackUrl(path: string) {
+  return new URL(path, window.location.origin).toString();
 }
 
 function GitHubIcon() {
@@ -66,13 +77,13 @@ function GoogleIcon() {
 }
 
 export function AuthForm({
+  enabledSocialProviders,
   mode,
   className,
   onSubmit,
   ...props
 }: AuthFormProps) {
   const router = useRouter();
-
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -84,7 +95,8 @@ export function AuthForm({
   const isLogin = mode === "login";
   const isSignup = mode === "signup";
   const isLoading = loadingAction !== null;
-
+  const hasSocialProviders =
+    enabledSocialProviders.github || enabledSocialProviders.google;
   const passwordsMatch =
     password.length > 0 &&
     confirmPassword.length > 0 &&
@@ -123,11 +135,14 @@ export function AuthForm({
   };
 
   const submitWithCredentials = async () => {
+    const verificationCallbackURL = getClientCallbackUrl("/login?verified=1");
+
     if (isSignup) {
       const { error } = await authClient.signUp.email({
         email,
         password,
         name,
+        callbackURL: verificationCallbackURL,
       });
 
       if (error) {
@@ -135,18 +150,28 @@ export function AuthForm({
         return;
       }
 
-      toast.success("Account created successfully!");
-      router.push("/home");
+      toast.success("Check your inbox to verify your email address.");
+      router.push("/login?verification=sent");
       return;
     }
 
     const { error } = await authClient.signIn.email({
       email,
       password,
+      callbackURL: verificationCallbackURL,
     });
 
     if (error) {
-      toast.error(error.message || "Invalid email or password");
+      const errorMessage = error.message ?? "";
+
+      if (errorMessage.toLowerCase().includes("email not verified")) {
+        toast.error(
+          "Email not verified. Check your inbox for a fresh verification link.",
+        );
+        return;
+      }
+
+      toast.error(errorMessage || "Invalid email or password");
       return;
     }
 
@@ -156,7 +181,9 @@ export function AuthForm({
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      return;
+    }
 
     setLoadingAction("submit");
 
@@ -206,7 +233,7 @@ export function AuthForm({
           </p>
         </div>
 
-        {isSignup && (
+        {isSignup ? (
           <Field>
             <FieldLabel htmlFor="name">Name</FieldLabel>
             <Input
@@ -218,7 +245,7 @@ export function AuthForm({
               required
             />
           </Field>
-        )}
+        ) : null}
 
         <Field>
           <FieldLabel htmlFor="email">Email</FieldLabel>
@@ -241,16 +268,16 @@ export function AuthForm({
           required
           description={
             isLogin ? (
-              <a href="#" className="text-sm text-primary hover:underline">
+              <Link href="/forgot-password" className="text-sm text-primary hover:underline">
                 Forgot your password?
-              </a>
+              </Link>
             ) : (
               "Must be at least 8 characters long."
             )
           }
         />
 
-        {isSignup && (
+        {isSignup ? (
           <PasswordField
             id="confirm-password"
             label="Confirm Password"
@@ -261,11 +288,13 @@ export function AuthForm({
             description={
               <span className="flex items-center gap-1">
                 Please confirm your password.
-                {passwordsMatch && <Check className="size-3.5 text-green-500" />}
+                {passwordsMatch ? (
+                  <Check className="size-3.5 text-green-500" />
+                ) : null}
               </span>
             }
           />
-        )}
+        ) : null}
 
         <Field>
           <Button
@@ -281,42 +310,49 @@ export function AuthForm({
           </Button>
         </Field>
 
-        <FieldSeparator>or</FieldSeparator>
+        {hasSocialProviders ? <FieldSeparator>or</FieldSeparator> : null}
+
+        {enabledSocialProviders.github ? (
+          <Field>
+            <OAuthButton
+              provider="github"
+              labelPrefix={oauthText}
+              isLoading={loadingAction === "github"}
+              disabled={isLoading}
+              onClick={() => handleSocialLogin("github")}
+              icon={<GitHubIcon />}
+            />
+          </Field>
+        ) : null}
+
+        {enabledSocialProviders.google ? (
+          <Field>
+            <OAuthButton
+              provider="google"
+              labelPrefix={oauthText}
+              isLoading={loadingAction === "google"}
+              disabled={isLoading}
+              onClick={() => handleSocialLogin("google")}
+              icon={<GoogleIcon />}
+            />
+          </Field>
+        ) : null}
 
         <Field>
-          <OAuthButton
-            provider="github"
-            labelPrefix={oauthText}
-            isLoading={loadingAction === "github"}
-            disabled={isLoading}
-            onClick={() => handleSocialLogin("github")}
-            icon={<GitHubIcon />}
-          />
-        </Field>
-
-        <Field>
-          <OAuthButton
-            provider="google"
-            labelPrefix={oauthText}
-            isLoading={loadingAction === "google"}
-            disabled={isLoading}
-            onClick={() => handleSocialLogin("google")}
-            icon={<GoogleIcon />}
-          />
           <FieldDescription className="text-center text-sm">
             {isLogin ? (
               <>
                 Don&apos;t have an account?{" "}
-                <a href="/signup" className="font-medium text-primary hover:underline">
+                <Link href="/signup" className="font-medium text-primary hover:underline">
                   Sign up
-                </a>
+                </Link>
               </>
             ) : (
               <>
                 Already have an account?{" "}
-                <a href="/login" className="font-medium text-primary hover:underline">
+                <Link href="/login" className="font-medium text-primary hover:underline">
                   Sign in
-                </a>
+                </Link>
               </>
             )}
           </FieldDescription>
