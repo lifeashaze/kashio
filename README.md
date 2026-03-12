@@ -6,6 +6,7 @@ Kashio is a full-stack expense tracking app with natural-language logging, built
 
 - Natural-language expense entry and dashboard
 - Email/password and OAuth authentication (GitHub, Google)
+- Telegram bot integration for expense logging and spending questions
 - API-first mutations with App Router routes
 - Drizzle ORM schema + migrations
 
@@ -37,6 +38,12 @@ GITHUB_CLIENT_ID="..."
 GITHUB_CLIENT_SECRET="..."
 GOOGLE_CLIENT_ID="..."
 GOOGLE_CLIENT_SECRET="..."
+
+# Telegram integration
+TELEGRAM_BOT_TOKEN="..."
+TELEGRAM_BOT_USERNAME="your_bot_username"
+TELEGRAM_WEBHOOK_SECRET="random-shared-secret"
+APP_BASE_URL="http://localhost:3000"
 ```
 
 Run the development server:
@@ -63,7 +70,25 @@ npm run db:studio
 npm run build
 npm run start
 npm run lint
+
+# Telegram
+npm run telegram:webhook:set -- https://your-public-url.example.com
 ```
+
+## Telegram Setup
+
+1. Create a bot with `@BotFather` and copy the bot token and username.
+2. Set `TELEGRAM_BOT_TOKEN`, `TELEGRAM_BOT_USERNAME`, `TELEGRAM_WEBHOOK_SECRET`, and `APP_BASE_URL`.
+3. Expose your app publicly.
+   - Local demo: use a tunnel such as `ngrok http 3000`
+   - Hosted demo: use your deployed app URL
+4. Register the webhook:
+
+```bash
+npm run telegram:webhook:set -- https://your-public-url.example.com
+```
+
+5. Open Kashio Profile > Integrations and connect Telegram.
 
 ## Project Structure
 

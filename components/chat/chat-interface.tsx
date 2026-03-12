@@ -53,7 +53,9 @@ export function ChatInterface({ userName }: ChatInterfaceProps) {
   const { messages, sendMessage, status } = useChat();
   const [input, setInput] = useState("");
   const [showScrollButton, setShowScrollButton] = useState(false);
-  const [supportsMediaRecorder, setSupportsMediaRecorder] = useState(false);
+  const [supportsMediaRecorder] = useState(
+    () => typeof window !== "undefined" && typeof MediaRecorder !== "undefined"
+  );
   const voice = useVoiceInput();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -65,10 +67,6 @@ export function ChatInterface({ userName }: ChatInterfaceProps) {
 
   const scrollToBottom = useCallback(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, []);
-
-  useEffect(() => {
-    setSupportsMediaRecorder(typeof MediaRecorder !== "undefined");
   }, []);
 
   useEffect(() => {
