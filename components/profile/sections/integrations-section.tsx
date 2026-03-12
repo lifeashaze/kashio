@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Link2, LoaderCircle, MessageCircle, MessagesSquare } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { Link2, LoaderCircle, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,26 +12,6 @@ import {
   useDisconnectTelegram,
   useTelegramIntegration,
 } from "@/lib/hooks/use-telegram-integration";
-
-type Integration = {
-  name: string;
-  subtitle: string;
-  description: string;
-  icon: LucideIcon;
-  color: string;
-  isConnected: boolean;
-};
-
-const staticIntegrations: Integration[] = [
-  {
-    name: "Discord",
-    subtitle: "Bot commands",
-    description: "Track expenses in Discord",
-    icon: MessagesSquare,
-    color: "#5865F2",
-    isConnected: false,
-  },
-];
 
 export function IntegrationsSection() {
   const [isOpeningBot, setIsOpeningBot] = useState(false);
@@ -66,10 +45,10 @@ export function IntegrationsSection() {
 
   return (
     <ProfileSection
-      title="Integrations"
-      description="Connect external services to track expenses anywhere"
+      title="Telegram"
+      description="Connect the Telegram bot to log expenses and ask spending questions."
     >
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-3">
         <Card
           className="group relative overflow-hidden transition-all hover:shadow-lg"
           style={{
@@ -164,55 +143,6 @@ export function IntegrationsSection() {
             </div>
           </CardContent>
         </Card>
-
-        {staticIntegrations.map((integration) => {
-          const Icon = integration.icon;
-
-          return (
-            <Card
-              key={integration.name}
-              className="group relative overflow-hidden transition-all hover:shadow-lg"
-              style={{
-                borderColor: `${integration.color}33`,
-              }}
-            >
-              <div
-                className="absolute right-0 top-0 h-32 w-32 translate-x-8 -translate-y-8 rounded-full transition-transform group-hover:scale-110"
-                style={{ backgroundColor: `${integration.color}14` }}
-              />
-              <CardContent className="relative p-4">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                  <div className="flex min-w-0 flex-1 items-center gap-3">
-                    <div
-                      className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
-                      style={{ backgroundColor: `${integration.color}22` }}
-                    >
-                      <Icon className="size-6" style={{ color: integration.color }} />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="font-semibold">{integration.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {integration.subtitle}
-                      </p>
-                    </div>
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full shrink-0 sm:w-auto sm:self-start"
-                    disabled
-                  >
-                    <Link2 className="mr-1.5 size-3.5" />
-                    Coming soon
-                  </Button>
-                </div>
-                <p className="mt-3 text-xs text-muted-foreground">
-                  {integration.description}
-                </p>
-              </CardContent>
-            </Card>
-          );
-        })}
       </div>
     </ProfileSection>
   );

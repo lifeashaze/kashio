@@ -1,7 +1,7 @@
 "use client";
 
 import { useChat } from "@ai-sdk/react";
-import { useRef, useEffect, useState, useCallback } from "react";
+import { useRef, useEffect, useState, useCallback, useSyncExternalStore } from "react";
 import { Send, Loader2, Copy, Check, ChevronDown, Sparkles, Mic, MicOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getUserInitials } from "@/lib/user";
@@ -53,9 +53,13 @@ export function ChatInterface({ userName }: ChatInterfaceProps) {
   const { messages, sendMessage, status } = useChat();
   const [input, setInput] = useState("");
   const [showScrollButton, setShowScrollButton] = useState(false);
-  const [supportsMediaRecorder] = useState(
-    () => typeof window !== "undefined" && typeof MediaRecorder !== "undefined"
+  const isClient = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
   );
+  const supportsMediaRecorder =
+    isClient && typeof MediaRecorder !== "undefined";
   const voice = useVoiceInput();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);

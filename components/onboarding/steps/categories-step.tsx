@@ -1,28 +1,24 @@
 "use client";
 
-import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
+import {
+  CATEGORY_LABELS,
+  EXPENSE_CATEGORIES,
+  type ExpenseCategory,
+} from "@/lib/constants/categories";
 
 interface CategoriesStepProps {
-  enabledCategories: string[];
-  onToggleCategory: (category: string) => void;
+  enabledCategories: ExpenseCategory[];
+  onToggleCategory: (category: ExpenseCategory) => void;
   onSelectAll: () => void;
   onDeselectAll: () => void;
 }
 
-const CATEGORIES = [
-  { id: "food", name: "Food" },
-  { id: "transport", name: "Transport" },
-  { id: "entertainment", name: "Entertainment" },
-  { id: "shopping", name: "Shopping" },
-  { id: "bills", name: "Bills" },
-  { id: "health", name: "Health" },
-  { id: "groceries", name: "Groceries" },
-  { id: "travel", name: "Travel" },
-  { id: "education", name: "Education" },
-  { id: "other", name: "Other" },
-];
+const CATEGORIES = EXPENSE_CATEGORIES.map((id) => ({
+  id,
+  name: CATEGORY_LABELS[id],
+}));
 
 export function CategoriesStep({
   enabledCategories,

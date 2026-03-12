@@ -8,7 +8,11 @@ import { BudgetStep } from "./steps/budget-step";
 import { CategoriesStep } from "./steps/categories-step";
 import { useSaveUserPreferences, useUpdateOnboardingStatus } from "@/lib/hooks/use-user-preferences";
 import { toast } from "sonner";
-import { DEFAULT_MONTHLY_BUDGET } from "@/lib/constants/budget";
+import type { ExpenseCategory } from "@/lib/constants/categories";
+import {
+  createDefaultUserPreferences,
+  DEFAULT_TIMEZONE,
+} from "@/lib/constants/preferences";
 
 const TOTAL_STEPS = 2;
 
@@ -23,25 +27,11 @@ export function OnboardingWizard() {
   const savePreferences = useSaveUserPreferences();
   const updateOnboarding = useUpdateOnboardingStatus();
 
-  const [formData, setFormData] = useState({
-    monthlyBudget: DEFAULT_MONTHLY_BUDGET,
-    currency: "USD",
-    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "America/Los_Angeles",
-    language: "en",
-    dateFormat: "MM/DD/YYYY",
-    enabledCategories: [
-      "food",
-      "transport",
-      "entertainment",
-      "shopping",
-      "bills",
-      "health",
-      "groceries",
-      "travel",
-      "education",
-      "other",
-    ],
-  });
+  const [formData, setFormData] = useState(() =>
+    createDefaultUserPreferences(
+      Intl.DateTimeFormat().resolvedOptions().timeZone || DEFAULT_TIMEZONE
+    )
+  );
 
   const handleNext = async () => {
     await updateOnboarding.mutateAsync({ step: currentStep + 1 });
@@ -52,21 +42,12 @@ export function OnboardingWizard() {
     setCurrentStep(currentStep - 1);
   };
 
-  const handleSkip = async () => {
-    if (currentStep === TOTAL_STEPS) {
-      await handleComplete();
-    } else {
-      await updateOnboarding.mutateAsync({ step: currentStep + 1 });
-      setCurrentStep(currentStep + 1);
-    }
-  };
-
   const handleComplete = async () => {
     try {
       await savePreferences.mutateAsync(formData);
       await updateOnboarding.mutateAsync({ completed: true });
       router.push("/home");
-    } catch (error) {
+    } catch {
       toast.error("Failed to complete onboarding. Please try again.");
     }
   };
@@ -78,7 +59,7 @@ export function OnboardingWizard() {
     return true;
   };
 
-  const handleToggleCategory = (category: string) => {
+  const handleToggleCategory = (category: ExpenseCategory) => {
     setFormData({
       ...formData,
       enabledCategories: formData.enabledCategories.includes(category)
@@ -90,18 +71,7 @@ export function OnboardingWizard() {
   const handleSelectAllCategories = () => {
     setFormData({
       ...formData,
-      enabledCategories: [
-        "food",
-        "transport",
-        "entertainment",
-        "shopping",
-        "bills",
-        "health",
-        "groceries",
-        "travel",
-        "education",
-        "other",
-      ],
+      enabledCategories: createDefaultUserPreferences().enabledCategories,
     });
   };
 
