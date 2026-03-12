@@ -168,7 +168,7 @@ export function HomeInput() {
 
   return (
     <div className="w-full space-y-3">
-      <form onSubmit={handleSubmit} className="w-full">
+      <form onSubmit={handleSubmit} className="w-full" autoComplete="off">
         <div className="flex items-end gap-2">
           <div className="flex-1 min-w-0">
             <label htmlFor="expense-input" className="sr-only">
@@ -181,6 +181,7 @@ export function HomeInput() {
                 onChange={(event) => setInput(event.target.value)}
                 placeholder="Add expense..."
                 className="h-11 w-full rounded-xl border border-border/70 bg-muted/20 px-3.5 text-base text-foreground placeholder:text-muted-foreground focus:border-primary/40 focus:bg-background/80 focus:outline-none"
+                autoComplete="off"
                 autoFocus
                 disabled={isLoading}
               />
