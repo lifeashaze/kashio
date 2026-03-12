@@ -6,10 +6,13 @@ const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 export async function POST(req: Request) {
   return withServerErrorBoundary("transcribe audio", async () => {
-    const auth = await requireRouteAuth();
+    const authPromise = requireRouteAuth();
+    const formDataPromise = req.formData();
+
+    const auth = await authPromise;
     if (!auth.ok) return auth.response;
 
-    const formData = await req.formData();
+    const formData = await formDataPromise;
     const audio = formData.get("audio");
 
     if (!audio || !(audio instanceof File)) {

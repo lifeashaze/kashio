@@ -1,8 +1,8 @@
 import { requireAuth } from "@/lib/api/auth";
 import { db } from "@/lib/db";
 import { userPreferences } from "@/lib/schema";
-import { eq } from "drizzle-orm";
 import { z } from "zod";
+import { getUserPreferencesForUser } from "@/lib/services/user-preferences";
 
 const preferencesSchema = z.object({
   monthlyBudget: z.number().positive(),
@@ -21,28 +21,26 @@ export async function GET() {
     return result.response;
   }
 
-  const prefs = await db
-    .select()
-    .from(userPreferences)
-    .where(eq(userPreferences.userId, result.session.user.id))
-    .limit(1);
-
-  if (prefs.length === 0) {
+  const prefs = await getUserPreferencesForUser(result.session.user.id);
+  if (!prefs) {
     return Response.json(null, { status: 404 });
   }
 
-  return Response.json(prefs[0]);
+  return Response.json(prefs);
 }
 
 // POST /api/user/preferences - Create or update preferences
 export async function POST(req: Request) {
-  const result = await requireAuth();
+  const authResultPromise = requireAuth();
+  const bodyPromise = req.json();
+
+  const result = await authResultPromise;
 
   if (!result.success) {
     return result.response;
   }
 
-  const body = await req.json();
+  const body = await bodyPromise;
 
   const validated = preferencesSchema.parse(body);
 

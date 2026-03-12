@@ -1,11 +1,8 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ExpenseInputDemo } from "./expense-input-demo";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { useSession } from "@/lib/session-context";
 
 const STEPS = [
   {
@@ -25,8 +22,11 @@ const STEPS = [
   },
 ];
 
-export function LandingPage() {
-  const { session, isLoading } = useSession();
+type LandingPageProps = {
+  hasSession: boolean;
+};
+
+export function LandingPage({ hasSession }: LandingPageProps) {
 
   return (
     <div className="flex min-h-screen flex-col bg-background lg:h-screen lg:overflow-hidden">
@@ -39,21 +39,19 @@ export function LandingPage() {
           </Link>
           <div className="flex items-center gap-2">
             <ThemeToggle />
-            {!isLoading && (
-              session ? (
-                <Button size="sm" className="bg-primary text-xs font-semibold shadow-sm shadow-primary/20 px-4" asChild>
-                  <Link href="/home">Dashboard</Link>
+            {hasSession ? (
+              <Button size="sm" className="bg-primary text-xs font-semibold shadow-sm shadow-primary/20 px-4" asChild>
+                <Link href="/home">Dashboard</Link>
+              </Button>
+            ) : (
+              <>
+                <Button variant="ghost" size="sm" className="text-xs text-muted-foreground" asChild>
+                  <Link href="/login">Sign in</Link>
                 </Button>
-              ) : (
-                <>
-                  <Button variant="ghost" size="sm" className="text-xs text-muted-foreground" asChild>
-                    <Link href="/login">Sign in</Link>
-                  </Button>
-                  <Button size="sm" className="bg-primary text-xs font-semibold shadow-sm shadow-primary/20 px-4" asChild>
-                    <Link href="/signup">Get started</Link>
-                  </Button>
-                </>
-              )
+                <Button size="sm" className="bg-primary text-xs font-semibold shadow-sm shadow-primary/20 px-4" asChild>
+                  <Link href="/signup">Get started</Link>
+                </Button>
+              </>
             )}
           </div>
         </div>
@@ -76,25 +74,23 @@ export function LandingPage() {
               Kashio reads plain English and turns it into structured expense data in real time. No forms, no categories to pick, no friction at all.
             </p>
 
-            {!isLoading && (
-              <div className="mt-7 flex flex-wrap items-center gap-3">
-                <Button
-                  size="lg"
-                  className="h-11 gap-2 px-6 text-[13px] font-semibold shadow-md shadow-primary/20 transition-all hover:shadow-lg hover:shadow-primary/25"
-                  asChild
-                >
-                  <Link href={session ? "/home" : "/signup"}>
-                    {session ? "Go to dashboard" : "Start for free"}
-                    <ArrowRight className="h-3.5 w-3.5" />
-                  </Link>
+            <div className="mt-7 flex flex-wrap items-center gap-3">
+              <Button
+                size="lg"
+                className="h-11 gap-2 px-6 text-[13px] font-semibold shadow-md shadow-primary/20 transition-all hover:shadow-lg hover:shadow-primary/25"
+                asChild
+              >
+                <Link href={hasSession ? "/home" : "/signup"}>
+                  {hasSession ? "Go to dashboard" : "Start for free"}
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              </Button>
+              {!hasSession && (
+                <Button variant="ghost" size="lg" className="h-11 px-5 text-[13px] text-muted-foreground hover:text-foreground" asChild>
+                  <Link href="/login">Sign in</Link>
                 </Button>
-                {!session && (
-                  <Button variant="ghost" size="lg" className="h-11 px-5 text-[13px] text-muted-foreground hover:text-foreground" asChild>
-                    <Link href="/login">Sign in</Link>
-                  </Button>
-                )}
-              </div>
-            )}
+              )}
+            </div>
           </div>
 
           {/* Steps */}

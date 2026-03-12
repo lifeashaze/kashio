@@ -2,9 +2,9 @@
 
 import { useMemo, useState, useEffect } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
-import type { Expense } from "@/lib/schema";
 import type { ExpenseCategory } from "@/lib/constants/categories";
 import { CATEGORY_LABELS } from "@/lib/constants/categories";
+import type { ClientExpense } from "@/lib/types/expense";
 
 const CATEGORY_COLORS: Record<ExpenseCategory, { light: string; dark: string }> = {
   food: { light: "#ea580c", dark: "#fb923c" },
@@ -20,7 +20,7 @@ const CATEGORY_COLORS: Record<ExpenseCategory, { light: string; dark: string }> 
 };
 
 interface CategoryBreakdownProps {
-  expenses: Expense[];
+  expenses: ClientExpense[];
   formatCurrency: (amount: number) => string;
 }
 

@@ -33,10 +33,13 @@ export async function GET() {
 
 export async function POST(request: Request) {
   return withServerErrorBoundary("create changelog entry", async () => {
-    const auth = await requireRouteAuth();
+    const authPromise = requireRouteAuth();
+    const bodyPromise = parseRequestBody(request, changelogRequestSchema);
+
+    const auth = await authPromise;
     if (!auth.ok) return auth.response;
 
-    const body = await parseRequestBody(request, changelogRequestSchema);
+    const body = await bodyPromise;
     if (!body.ok) return body.response;
 
     const [entry] = await db

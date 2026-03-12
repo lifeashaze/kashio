@@ -11,13 +11,11 @@ import { toast } from "sonner";
 import { getUserInitials } from "@/lib/user";
 
 interface HomeNavProps {
-  user: {
-    name: string;
-    email: string;
-  };
+  name: string;
+  email: string;
 }
 
-export function HomeNav({ user }: HomeNavProps) {
+export function HomeNav({ name, email }: HomeNavProps) {
   const router = useRouter();
   const pathname = usePathname();
   const isOnChat = pathname === "/chat";
@@ -70,7 +68,7 @@ export function HomeNav({ user }: HomeNavProps) {
               aria-label="Open profile menu"
               onClick={() => setShowMenu(!showMenu)}
             >
-              {getUserInitials(user.name)}
+              {getUserInitials(name)}
             </Button>
             {showMenu && (
               <>
@@ -82,11 +80,11 @@ export function HomeNav({ user }: HomeNavProps) {
                   <div className="border-b border-border p-4">
                     <div className="flex items-center gap-3">
                       <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
-                        {getUserInitials(user.name)}
+                        {getUserInitials(name)}
                       </div>
                       <div className="flex-1 overflow-hidden">
-                        <p className="truncate font-medium text-foreground">{user.name}</p>
-                        <p className="truncate text-xs text-muted-foreground">{user.email}</p>
+                        <p className="truncate font-medium text-foreground">{name}</p>
+                        <p className="truncate text-xs text-muted-foreground">{email}</p>
                       </div>
                     </div>
                   </div>

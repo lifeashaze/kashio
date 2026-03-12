@@ -2,29 +2,20 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api/client";
-import type { Expense } from "@/lib/schema";
 import { toast } from "sonner";
+import { expenseKeys } from "@/lib/query-keys";
 import type {
+  ClientExpense,
   CreateExpensePayload,
   UpdateExpensePayload,
 } from "@/lib/types/expense";
-
-// Query keys
-export const expenseKeys = {
-  all: ["expenses"] as const,
-  lists: () => [...expenseKeys.all, "list"] as const,
-  list: (filters?: Record<string, unknown>) =>
-    [...expenseKeys.lists(), filters] as const,
-  details: () => [...expenseKeys.all, "detail"] as const,
-  detail: (id: string) => [...expenseKeys.details(), id] as const,
-};
 
 // Fetch all expenses
 export function useExpenses() {
   return useQuery({
     queryKey: expenseKeys.lists(),
     queryFn: async () => {
-      const data = await apiClient.get<Expense[]>("/api/expenses");
+      const data = await apiClient.get<ClientExpense[]>("/api/expenses");
       return data;
     },
   });
@@ -36,7 +27,7 @@ export function useCreateExpense() {
 
   return useMutation({
     mutationFn: async (expense: CreateExpensePayload) => {
-      return await apiClient.post<Expense>("/api/expenses", expense);
+      return await apiClient.post<ClientExpense>("/api/expenses", expense);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: expenseKeys.lists() });
@@ -75,7 +66,7 @@ export function useUpdateExpense() {
   return useMutation({
     mutationFn: async (expense: UpdateExpensePayload) => {
       const { id, ...payload } = expense;
-      return await apiClient.put<Expense>(`/api/expenses/${id}`, payload);
+      return await apiClient.put<ClientExpense>(`/api/expenses/${id}`, payload);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: expenseKeys.lists() });

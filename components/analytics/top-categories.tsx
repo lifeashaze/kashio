@@ -2,9 +2,9 @@
 
 import { useMemo, useState, useEffect } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
-import type { Expense } from "@/lib/schema";
 import type { ExpenseCategory } from "@/lib/constants/categories";
 import { CATEGORY_LABELS } from "@/lib/constants/categories";
+import type { ClientExpense } from "@/lib/types/expense";
 
 const CATEGORY_COLORS: Record<ExpenseCategory, { light: string; dark: string }> = {
   food: { light: "#b45309", dark: "#fbbf24" },
@@ -38,7 +38,7 @@ function CustomTooltip({ active, payload }: TooltipProps) {
 }
 
 interface TopCategoriesProps {
-  expenses: Expense[];
+  expenses: ClientExpense[];
   formatCurrency: (amount: number) => string;
 }
 

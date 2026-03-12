@@ -1,9 +1,6 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { useSession } from "@/lib/session-context";
 
 const CHIPS = [
   "coffee with sarah $12",
@@ -13,8 +10,11 @@ const CHIPS = [
   "gym monthly 89",
 ];
 
-export function Hero() {
-  const { session, isLoading } = useSession();
+type HeroProps = {
+  hasSession: boolean;
+};
+
+export function Hero({ hasSession }: HeroProps) {
 
   return (
     <section
@@ -41,30 +41,28 @@ export function Hero() {
         </p>
 
         {/* CTA */}
-        {!isLoading && (
-          <div className="mt-9 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+        <div className="mt-9 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+          <Button
+            size="lg"
+            className="h-12 w-full px-8 text-sm font-semibold shadow-lg shadow-primary/20 transition-all hover:shadow-xl hover:shadow-primary/25 sm:w-auto"
+            asChild
+          >
+            <Link href={hasSession ? "/home" : "/signup"}>
+              {hasSession ? "Go to dashboard" : "Start for free"}
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
+          {!hasSession && (
             <Button
               size="lg"
-              className="h-12 w-full px-8 text-sm font-semibold shadow-lg shadow-primary/20 transition-all hover:shadow-xl hover:shadow-primary/25 sm:w-auto"
+              variant="ghost"
+              className="h-12 w-full px-8 text-sm font-medium text-muted-foreground hover:text-foreground sm:w-auto"
               asChild
             >
-              <Link href={session ? "/home" : "/signup"}>
-                {session ? "Go to dashboard" : "Start for free"}
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
+              <Link href="/login">Sign in</Link>
             </Button>
-            {!session && (
-              <Button
-                size="lg"
-                variant="ghost"
-                className="h-12 w-full px-8 text-sm font-medium text-muted-foreground hover:text-foreground sm:w-auto"
-                asChild
-              >
-                <Link href="/login">Sign in</Link>
-              </Button>
-            )}
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Static example chips */}
         <div className="mt-12 flex flex-wrap items-center justify-center gap-2 sm:mt-14">

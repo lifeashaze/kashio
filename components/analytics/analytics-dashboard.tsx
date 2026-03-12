@@ -1,20 +1,33 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useState, useMemo } from "react";
 import { useExpenses } from "@/lib/hooks/use-expenses";
 import { useUserPreferences } from "@/lib/hooks/use-user-preferences";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar as CalendarIcon, ArrowLeft } from "lucide-react";
-import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { AnalyticsDashboardSkeleton } from "@/components/skeletons";
 import { format } from "date-fns";
 import Link from "next/link";
-import { SpendingChart } from "./spending-chart";
-import { CategoryBreakdown } from "./category-breakdown";
 import { SpendingStats } from "./spending-stats";
-import { SpendingVsBudget } from "./spending-vs-budget";
+
+const Calendar = dynamic(() =>
+  import("@/components/ui/calendar").then((mod) => mod.Calendar)
+);
+
+const SpendingChart = dynamic(() =>
+  import("./spending-chart").then((mod) => mod.SpendingChart)
+);
+
+const CategoryBreakdown = dynamic(() =>
+  import("./category-breakdown").then((mod) => mod.CategoryBreakdown)
+);
+
+const SpendingVsBudget = dynamic(() =>
+  import("./spending-vs-budget").then((mod) => mod.SpendingVsBudget)
+);
 
 type DateRangeType = "month" | "year" | "custom";
 

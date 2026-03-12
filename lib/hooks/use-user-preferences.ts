@@ -1,14 +1,15 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api/client";
-import type { UserPreferences } from "@/lib/schema";
 import { toast } from "sonner";
+import { userPreferenceKeys } from "@/lib/query-keys";
+import type { ClientUserPreferences } from "@/lib/types/expense";
 
 export function useUserPreferences() {
   return useQuery({
-    queryKey: ["userPreferences"],
+    queryKey: userPreferenceKeys.all,
     queryFn: async () => {
       try {
-        const data = await apiClient.get<UserPreferences>("/api/user/preferences");
+        const data = await apiClient.get<ClientUserPreferences>("/api/user/preferences");
         return data;
       } catch {
         // If no preferences exist yet, return null.
@@ -31,10 +32,10 @@ export function useSaveUserPreferences() {
       dateFormat: string;
       enabledCategories: string[];
     }) => {
-      return apiClient.post<UserPreferences>("/api/user/preferences", preferences);
+      return apiClient.post<ClientUserPreferences>("/api/user/preferences", preferences);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["userPreferences"] });
+      queryClient.invalidateQueries({ queryKey: userPreferenceKeys.all });
       toast.success("Preferences saved successfully");
     },
     onError: () => {

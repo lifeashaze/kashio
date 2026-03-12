@@ -1,7 +1,9 @@
+import { cache } from "react";
 import { and, desc, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { expenses } from "@/lib/schema";
 import { type CreateExpensePayload, type UpdateExpenseInput } from "@/lib/expenses/schemas";
+import type { ClientExpense } from "@/lib/types/expense";
 
 export async function createExpenseForUser(
   userId: string,
@@ -22,13 +24,22 @@ export async function createExpenseForUser(
   return result[0];
 }
 
-export async function listExpensesForUser(userId: string) {
+export const listExpensesForUser = cache(async function listExpensesForUser(
+  userId: string
+): Promise<ClientExpense[]> {
   return db
-    .select()
+    .select({
+      id: expenses.id,
+      amount: expenses.amount,
+      description: expenses.description,
+      category: expenses.category,
+      date: expenses.date,
+      rawInput: expenses.rawInput,
+    })
     .from(expenses)
     .where(eq(expenses.userId, userId))
     .orderBy(desc(expenses.createdAt));
-}
+});
 
 export async function findOwnedExpense(id: string, userId: string) {
   const [expense] = await db

@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { LoaderCircle, Save } from "lucide-react";
-import type { UserPreferences } from "@/lib/schema";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -25,6 +24,7 @@ import {
   useSaveUserPreferences,
   useUserPreferences,
 } from "@/lib/hooks/use-user-preferences";
+import type { ClientUserPreferences } from "@/lib/types/expense";
 
 type PreferencesFormValues = {
   monthlyBudget: number;
@@ -36,7 +36,7 @@ type PreferencesFormValues = {
 };
 
 function mapPreferencesToFormValues(
-  preferences: UserPreferences | null | undefined,
+  preferences: ClientUserPreferences | null | undefined,
   browserTimezone: string
 ): PreferencesFormValues {
   if (!preferences) {

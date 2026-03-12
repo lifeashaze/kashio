@@ -3,9 +3,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { apiClient } from "@/lib/api/client";
+import { telegramIntegrationQueryKey } from "@/lib/query-keys";
 import type { TelegramLinkStatusResponse } from "@/lib/telegram/types";
-
-const telegramIntegrationQueryKey = ["telegramIntegration"];
 
 type TelegramLinkResponse = {
   botUsername: string;

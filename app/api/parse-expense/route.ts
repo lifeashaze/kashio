@@ -11,10 +11,13 @@ import { parseExpensePrompt } from "@/lib/services/expense-parser";
 
 export async function POST(req: Request) {
   return withServerErrorBoundary("parse expense", async () => {
-    const auth = await requireRouteAuth();
+    const authPromise = requireRouteAuth();
+    const bodyPromise = parseRequestBody(req, parseExpenseRequestSchema);
+
+    const auth = await authPromise;
     if (!auth.ok) return auth.response;
 
-    const body = await parseRequestBody(req, parseExpenseRequestSchema);
+    const body = await bodyPromise;
     if (!body.ok) return body.response;
 
     const { prompt } = body.data;

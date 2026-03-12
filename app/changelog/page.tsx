@@ -1,4 +1,4 @@
-import { Footer } from "@/components/landing";
+import { Footer } from "@/components/landing/footer";
 import { ChangelogHeader } from "@/components/changelog-header";
 import { db } from "@/lib/db";
 import { changelog } from "@/lib/schema";
