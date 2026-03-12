@@ -10,8 +10,8 @@ export function useUserPreferences() {
       try {
         const data = await apiClient.get<UserPreferences>("/api/user/preferences");
         return data;
-      } catch (err) {
-        // If no preferences exist yet, return null (user hasn't completed onboarding)
+      } catch {
+        // If no preferences exist yet, return null.
         return null;
       }
     },
@@ -39,23 +39,6 @@ export function useSaveUserPreferences() {
     },
     onError: () => {
       toast.error("Failed to save preferences");
-    },
-  });
-}
-
-export function useUpdateOnboardingStatus() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({ completed, step }: { completed?: boolean; step?: number }) => {
-      return apiClient.patch("/api/user/onboarding", { completed, step });
-    },
-    onSuccess: () => {
-      // Invalidate session to get updated onboarding status
-      queryClient.invalidateQueries({ queryKey: ["session"] });
-    },
-    onError: () => {
-      toast.error("Failed to update onboarding status");
     },
   });
 }

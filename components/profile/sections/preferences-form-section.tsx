@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Check, LoaderCircle, Save } from "lucide-react";
+import { LoaderCircle, Save } from "lucide-react";
 import type { UserPreferences } from "@/lib/schema";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -16,11 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ProfileSection } from "@/components/profile/sections/profile-section";
-import {
-  CATEGORY_LABELS,
-  EXPENSE_CATEGORIES,
-  type ExpenseCategory,
-} from "@/lib/constants/categories";
+import { EXPENSE_CATEGORIES } from "@/lib/constants/categories";
 import {
   createDefaultUserPreferences,
   CURRENCIES,
@@ -40,14 +35,6 @@ type PreferencesFormValues = {
   enabledCategories: string[];
 };
 
-function sortEnabledCategories(categories: string[]) {
-  return [...categories].sort(
-    (left, right) =>
-      EXPENSE_CATEGORIES.indexOf(left as ExpenseCategory) -
-      EXPENSE_CATEGORIES.indexOf(right as ExpenseCategory)
-  );
-}
-
 function mapPreferencesToFormValues(
   preferences: UserPreferences | null | undefined,
   browserTimezone: string
@@ -62,7 +49,7 @@ function mapPreferencesToFormValues(
     timezone: preferences.timezone,
     language: preferences.language,
     dateFormat: preferences.dateFormat,
-    enabledCategories: sortEnabledCategories(preferences.enabledCategories),
+    enabledCategories: [...EXPENSE_CATEGORIES],
   };
 }
 
@@ -73,7 +60,7 @@ function serializePreferences(values: PreferencesFormValues | null) {
 
   return JSON.stringify({
     ...values,
-    enabledCategories: sortEnabledCategories(values.enabledCategories),
+    enabledCategories: [...EXPENSE_CATEGORIES],
   });
 }
 
@@ -117,43 +104,6 @@ export function PreferencesFormSection() {
     !isBudgetValid ||
     isLoading ||
     savePreferences.isPending;
-
-  const handleToggleCategory = (category: ExpenseCategory) => {
-    if (!formValues) {
-      return;
-    }
-
-    const enabledCategories = formValues.enabledCategories.includes(category)
-      ? formValues.enabledCategories.filter((current) => current !== category)
-      : [...formValues.enabledCategories, category];
-
-    setFormValues({
-      ...formValues,
-      enabledCategories: sortEnabledCategories(enabledCategories),
-    });
-  };
-
-  const handleSelectAll = () => {
-    if (!formValues) {
-      return;
-    }
-
-    setFormValues({
-      ...formValues,
-      enabledCategories: [...EXPENSE_CATEGORIES],
-    });
-  };
-
-  const handleClearAll = () => {
-    if (!formValues) {
-      return;
-    }
-
-    setFormValues({
-      ...formValues,
-      enabledCategories: [],
-    });
-  };
 
   const handleSave = async () => {
     if (isSaveDisabled || !formValues) {
@@ -229,64 +179,6 @@ export function PreferencesFormSection() {
               <p className="text-xs text-muted-foreground">
                 Applied anywhere amounts are formatted across the app.
               </p>
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h3 className="text-sm font-medium">Expense Categories</h3>
-                <p className="text-xs text-muted-foreground">
-                  Control which categories are available when logging expenses.
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleSelectAll}
-                  disabled={isLoading || savePreferences.isPending}
-                >
-                  Select all
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleClearAll}
-                  disabled={isLoading || savePreferences.isPending}
-                >
-                  Clear
-                </Button>
-              </div>
-            </div>
-
-            <div className="grid gap-2 sm:grid-cols-2">
-              {EXPENSE_CATEGORIES.map((category) => {
-                const isChecked = formValues?.enabledCategories.includes(category);
-
-                return (
-                  <label
-                    key={category}
-                    className="flex items-center gap-3 rounded-xl border border-border bg-muted/20 px-3 py-2.5 transition-colors hover:bg-accent"
-                  >
-                    <Checkbox
-                      checked={Boolean(isChecked)}
-                      disabled={isLoading || savePreferences.isPending}
-                      onCheckedChange={() => handleToggleCategory(category)}
-                    />
-                    <div className="flex min-w-0 flex-1 items-center justify-between gap-3">
-                      <span className="text-sm font-medium">
-                        {CATEGORY_LABELS[category]}
-                      </span>
-                      {isChecked ? (
-                        <Check className="size-4 text-primary" />
-                      ) : null}
-                    </div>
-                  </label>
-                );
-              })}
             </div>
           </div>
 
