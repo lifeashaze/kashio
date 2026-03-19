@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, ReceiptText } from "lucide-react";
+import { ChevronLeft, ChevronRight, ReceiptText, Search, X } from "lucide-react";
 import {
   useDeleteExpense,
   useExpenses,
   useUpdateExpense,
 } from "@/lib/hooks/use-expenses";
 import { useUserPreferences } from "@/lib/hooks/use-user-preferences";
-import type { UpdateExpensePayload } from "@/lib/types/expense";
+import type { ClientExpense, UpdateExpensePayload } from "@/lib/types/expense";
 import { ExpenseEditDialog } from "@/components/home/stats/expense-edit-dialog";
 import { ExpenseRow } from "@/components/home/stats/expense-row";
 import { CATEGORY_META } from "@/components/home/stats/expense-row";
@@ -19,22 +19,34 @@ import {
   EXPENSE_CATEGORIES,
   type ExpenseCategory,
 } from "@/lib/constants/categories";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import type { ClientExpense } from "@/lib/types/expense";
 
-function EmptyState({ hasExpenses }: { hasExpenses: boolean }) {
+function EmptyState({
+  hasExpenses,
+  isSearching,
+}: {
+  hasExpenses: boolean;
+  isSearching: boolean;
+}) {
   return (
     <div className="flex flex-col items-center justify-center px-4 py-12 text-center">
       <div className="mb-2.5 flex h-9 w-9 items-center justify-center rounded-lg border border-border/60 bg-muted/30 text-muted-foreground">
         <ReceiptText className="h-3.5 w-3.5" />
       </div>
       <p className="text-[13px] font-semibold text-foreground">
-        {hasExpenses ? "No transactions this month" : "No transactions yet"}
+        {isSearching
+          ? "No results found"
+          : hasExpenses
+            ? "No transactions this month"
+            : "No transactions yet"}
       </p>
       <p className="mt-0.5 text-[11px] text-muted-foreground">
-        {hasExpenses
-          ? "Try a different month or category."
-          : "Add your first expense to start tracking."}
+        {isSearching
+          ? "Try a different search term."
+          : hasExpenses
+            ? "Try a different month or category."
+            : "Add your first expense to start tracking."}
       </p>
     </div>
   );
@@ -51,6 +63,7 @@ export function HomeStats() {
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [editingExpense, setEditingExpense] = useState<ClientExpense | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<ExpenseCategory | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const [selectedMonth, setSelectedMonth] = useState(() => {
     const now = new Date();
@@ -97,6 +110,7 @@ export function HomeStats() {
   const prevMonth = () => {
     if (isAtEarliestMonth) return;
     setSelectedCategory(null);
+    setSearchQuery("");
     setSelectedMonth((prev) => {
       const d = new Date(prev.year, prev.month - 1);
       return { year: d.getFullYear(), month: d.getMonth() };
@@ -106,6 +120,7 @@ export function HomeStats() {
   const nextMonth = () => {
     if (isCurrentMonth) return;
     setSelectedCategory(null);
+    setSearchQuery("");
     setSelectedMonth((prev) => {
       const d = new Date(prev.year, prev.month + 1);
       return { year: d.getFullYear(), month: d.getMonth() };
@@ -122,11 +137,6 @@ export function HomeStats() {
     [expenses, selectedMonth],
   );
 
-  const monthlyTotal = useMemo(
-    () => monthlyExpenses.reduce((sum, e) => sum + Number(e.amount), 0),
-    [monthlyExpenses],
-  );
-
   const usedCategories = useMemo(() => {
     const present = new Set(monthlyExpenses.map((e) => e.category));
     return EXPENSE_CATEGORIES.filter((c) => present.has(c));
@@ -138,13 +148,22 @@ export function HomeStats() {
     }
   }, [usedCategories, selectedCategory]);
 
-  const filteredExpenses = useMemo(
-    () =>
-      selectedCategory
-        ? monthlyExpenses.filter((e) => e.category === selectedCategory)
-        : monthlyExpenses,
-    [monthlyExpenses, selectedCategory],
-  );
+  const filteredExpenses = useMemo(() => {
+    let result = selectedCategory
+      ? monthlyExpenses.filter((e) => e.category === selectedCategory)
+      : monthlyExpenses;
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter(
+        (e) =>
+          e.description.toLowerCase().includes(q) ||
+          CATEGORY_LABELS[e.category as ExpenseCategory]?.toLowerCase().includes(q),
+      );
+    }
+
+    return result;
+  }, [monthlyExpenses, selectedCategory, searchQuery]);
 
   const formatCurrency = (amount: number) =>
     new Intl.NumberFormat("en-US", {
@@ -239,7 +258,7 @@ export function HomeStats() {
       {/* ── Transactions card ── */}
       <div className="overflow-hidden rounded-xl border border-border/70 bg-card shadow-sm">
 
-        {/* Header: month navigation as title, total right */}
+        {/* Header: month navigation as title, search + total right */}
         <div className="flex items-center justify-between border-b border-border/50 px-4 py-2.5">
           <div className="flex items-center gap-1">
             <button
@@ -262,13 +281,37 @@ export function HomeStats() {
               <ChevronRight className="h-3 w-3" />
             </button>
           </div>
-          <span className="font-mono text-[12px] font-semibold tabular-nums text-muted-foreground">
-            {formatCurrency(filteredExpenses.reduce((s, e) => s + Number(e.amount), 0))}
-          </span>
+          <div className="flex items-center gap-2">
+            <div className="relative flex items-center">
+              <Search className="pointer-events-none absolute left-2 h-3 w-3 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="h-6 w-28 rounded-md pl-6 pr-5 text-[11px] transition-all duration-200 focus-visible:w-44"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  aria-label="Clear search"
+                  className="absolute right-1.5 text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              )}
+            </div>
+            <span className="font-mono text-[12px] font-semibold tabular-nums text-muted-foreground">
+              {formatCurrency(filteredExpenses.reduce((s, e) => s + Number(e.amount), 0))}
+            </span>
+          </div>
         </div>
 
         {filteredExpenses.length === 0 ? (
-          <EmptyState hasExpenses={expenses.length > 0} />
+          <EmptyState
+            hasExpenses={expenses.length > 0}
+            isSearching={searchQuery.trim().length > 0}
+          />
         ) : (
           <>
             <div className="hidden border-b border-border/40 bg-muted/20 px-4 py-1.5 md:block">
