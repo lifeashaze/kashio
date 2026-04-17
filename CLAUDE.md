@@ -69,7 +69,7 @@ app/api/
 ├── clear-session/route.ts         # Clear session + redirect to login
 ├── expenses/route.ts              # GET (user expenses) / POST (create expense)
 ├── expenses/[id]/route.ts         # PUT (update) / DELETE (delete expense)
-├── parse-expense/route.ts         # POST: AI NLP expense parser (Groq, Kimi-k2)
+├── parse-expense/route.ts         # POST: AI NLP expense parser (Groq, GPT OSS 120B)
 ├── chat/route.ts                  # POST: streaming AI chat with expense context
 ├── transcribe/route.ts            # POST: audio → text (Groq Whisper)
 ├── user/preferences/route.ts      # GET / POST user preferences

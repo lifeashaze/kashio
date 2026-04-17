@@ -24,7 +24,7 @@ export async function parseExpensePrompt({
   const resolvedCurrentDate = currentDate ?? dateToDateOnlyString(new Date());
 
   const result = await generateObject({
-    model: groq("moonshotai/kimi-k2-instruct-0905"),
+    model: groq("openai/gpt-oss-120b"),
     schema: parsedExpenseSchema,
     temperature: 0,
     system: getExpenseParserPrompt({ currentDate: resolvedCurrentDate }),

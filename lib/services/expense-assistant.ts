@@ -70,7 +70,7 @@ export async function streamExpenseAssistantResponse({
   ]);
 
   return streamText({
-    model: groq("moonshotai/kimi-k2-instruct-0905"),
+    model: groq("openai/gpt-oss-120b"),
     system,
     messages: modelMessages,
   });
@@ -86,7 +86,7 @@ export async function answerExpenseQuestion({
   const system = await getAssistantSystemPrompt(userId);
 
   const result = await generateText({
-    model: groq("moonshotai/kimi-k2-instruct-0905"),
+    model: groq("openai/gpt-oss-120b"),
     system,
     prompt,
   });
