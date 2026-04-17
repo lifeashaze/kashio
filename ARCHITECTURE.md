@@ -5,8 +5,8 @@
 | Purpose | Model | API Route |
 |---|---|---|
 | Voice transcription | `whisper-large-v3-turbo` | `/api/transcribe` |
-| Expense parsing | `moonshotai/kimi-k2-instruct-0905` | `/api/parse-expense` |
-| Chat assistant | `moonshotai/kimi-k2-instruct-0905` | `/api/chat` |
+| Expense parsing | `openai/gpt-oss-120b` | `/api/parse-expense` |
+| Chat assistant | `openai/gpt-oss-120b` | `/api/chat` |
 
 ---
 
